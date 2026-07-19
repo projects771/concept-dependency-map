@@ -83,6 +83,18 @@
   min-width: 0;
 }
 
+.toolbar-back {
+  font-size: 12px;
+  color: var(--parchment-dim);
+  padding: 5px 10px;
+  border-color: var(--line-faint);
+}
+
+.toolbar-back:hover {
+  color: var(--parchment);
+  border-color: var(--trail);
+}
+
 .toolbar-hint {
   font-size: 12px;
   color: var(--parchment-faint);

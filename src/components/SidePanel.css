@@ -52,10 +52,31 @@
   border: 1px solid var(--rust-dim);
   color: var(--parchment);
   border-radius: var(--radius-sm);
-  font-size: 13px;
   padding: 10px 12px;
   margin-bottom: 14px;
-  line-height: 1.4;
+}
+
+.gap-notice-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.gap-notice-badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.gap-notice-body {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--parchment-dim);
+  margin: 0;
 }
 
 .side-panel-description {
