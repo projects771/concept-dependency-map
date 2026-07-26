@@ -1,151 +1,125 @@
-.concept-node {
+.cn {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 190px;
-  padding: 10px 16px 10px 12px;
-  background: linear-gradient(180deg, var(--ink-elevated), var(--ink-elevated-2));
-  border: 1px solid var(--line-soft);
-  border-left: 3px solid var(--trail);
-  border-radius: var(--radius-md);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  gap: var(--sp-3);
+  min-width: 170px;
+  padding: 10px 14px 10px 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--mastery-dot);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease;
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
 }
 
-.concept-node:hover {
+.cn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-md);
+  border-color: var(--c-border-2);
 }
 
-.concept-node.is-selected {
-  border-color: var(--brass);
-  box-shadow: 0 0 0 1px var(--brass), 0 10px 26px rgba(0, 0, 0, 0.45);
+.cn--selected {
+  border-color: var(--c-accent) !important;
+  box-shadow: var(--shadow-accent) !important;
 }
 
-.concept-marker {
-  flex: 0 0 auto;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* mastery border colors applied via CSS var */
+.cn--confident  { --mastery-dot: var(--c-confident); }
+.cn--learning   { --mastery-dot: var(--c-learning);  }
+.cn--struggling { --mastery-dot: var(--c-struggling); }
+
+/* gap risk */
+.cn--risk {
+  border-color: var(--c-struggling);
+  box-shadow: 0 0 0 1px rgba(248,113,113,0.4), var(--shadow-sm);
+}
+.cn--risk-medium {
+  border-color: var(--c-learning);
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.4), var(--shadow-sm);
 }
 
-.concept-marker-dot {
+/* risk badge */
+.cn-risk-badge {
+  position: absolute;
+  top: -11px;
+  right: -6px;
+  background: var(--c-struggling);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.03em;
+  animation: badge-pulse 2.5s ease-in-out infinite;
+}
+
+.cn--risk-medium .cn-risk-badge {
+  background: var(--c-learning);
+  color: #000;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+
+/* status dot */
+.cn-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--trail);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  background: var(--mastery-dot);
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--mastery-dot) 50%, transparent);
 }
 
-.mastery-confident .concept-marker-dot {
-  background: var(--moss);
-  box-shadow: 0 0 8px 1px rgba(132, 160, 138, 0.55);
-}
-.mastery-confident.concept-node {
-  border-left-color: var(--moss);
-}
-
-.mastery-learning .concept-marker-dot {
-  background: var(--brass);
-  box-shadow: 0 0 8px 1px rgba(205, 156, 79, 0.5);
-}
-.mastery-learning.concept-node {
-  border-left-color: var(--brass);
-}
-
-.mastery-struggling .concept-marker-dot {
-  background: var(--rust);
-  box-shadow: 0 0 8px 1px rgba(196, 90, 60, 0.6);
-}
-.mastery-struggling.concept-node {
-  border-left-color: var(--rust);
-}
-
-.concept-body {
+.cn-body {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
 }
 
-.concept-id {
-  font-size: 10px;
-  color: var(--parchment-faint);
-  letter-spacing: 0.04em;
-}
-
-.concept-title {
-  font-size: 15px;
+.cn-title {
+  font-size: 14px;
   font-weight: 500;
-  line-height: 1.2;
-  color: var(--parchment);
+  color: var(--c-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
 }
 
-.concept-status {
+.cn-status {
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--parchment-dim);
+  color: var(--c-text-3);
 }
 
-.concept-handle {
-  width: 8px;
-  height: 8px;
-  background: var(--trail);
-  border: 1px solid var(--ink);
+/* React Flow handles */
+.cn-handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: var(--c-surface-3) !important;
+  border: 1.5px solid var(--c-border-2) !important;
+  transition: background var(--t-fast);
 }
 
-.gap-badge {
-  position: absolute;
-  top: -12px;
-  right: -6px;
-  background: var(--rust);
-  color: var(--parchment);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  padding: 3px 7px;
-  border-radius: 999px;
-  white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
-  animation: gap-pulse 2.4s ease-in-out infinite;
+.cn-handle:hover {
+  background: var(--c-accent) !important;
+  border-color: var(--c-accent) !important;
 }
 
-.has-gap-risk.concept-node {
-  border-color: var(--rust);
-  box-shadow: 0 0 0 1px rgba(196, 90, 60, 0.5), 0 10px 26px rgba(0, 0, 0, 0.45);
-}
-
-.has-gap-risk.risk-medium.concept-node {
-  border-color: var(--brass);
-  box-shadow: 0 0 0 1px rgba(205, 156, 79, 0.5), 0 10px 26px rgba(0, 0, 0, 0.45);
-}
-
-.has-gap-risk.risk-medium .gap-badge {
-  background: var(--brass-dim);
-}
-
-@keyframes gap-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.06);
-  }
-}
+.cn-handle--target { left: -5px !important; }
+.cn-handle--source { right: -5px !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .gap-badge {
-    animation: none;
-  }
+  .cn-risk-badge { animation: none; }
 }

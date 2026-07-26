@@ -1,80 +1,88 @@
-.dialog-overlay {
+.acd-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(8, 11, 13, 0.6);
-  backdrop-filter: blur(2px);
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 40;
+  padding: var(--sp-6);
 }
 
-.dialog-card {
-  width: 420px;
-  max-width: 90vw;
-  max-height: 86vh;
+.acd-panel {
+  width: 440px;
+  max-width: 100%;
+  max-height: 90vh;
   overflow-y: auto;
-  background: linear-gradient(180deg, var(--ink-elevated), var(--ink-soft));
-  border: 1px solid var(--line-soft);
-  border-top: 3px solid var(--brass);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-deep);
-  padding: 24px 26px 22px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-2);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--sp-6) var(--sp-8) var(--sp-8);
+}
+
+.acd-header {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--sp-6);
 }
 
-.dialog-eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--brass);
-}
-
-.dialog-title {
+.acd-title {
   font-size: 22px;
   font-weight: 500;
-  margin: 4px 0 18px;
-  color: var(--parchment);
+  color: var(--c-text);
+  line-height: 1.2;
 }
 
-.dialog-label {
+.acd-close {
+  margin-top: -2px;
+  flex-shrink: 0;
+}
+
+.acd-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.acd-label {
+  color: var(--c-text-2);
+}
+
+.acd-required {
+  color: var(--c-error);
+  margin-left: 2px;
+}
+
+.input--error {
+  border-color: var(--c-error) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15) !important;
+}
+
+.acd-error-msg {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--parchment-dim);
-  margin-bottom: 6px;
-  margin-top: 14px;
+  color: var(--c-error);
 }
 
-.dialog-label-hint {
-  font-weight: 400;
-  color: var(--parchment-faint);
-}
-
-.dialog-input {
-  font-family: var(--font-body);
-  font-size: 14px;
-  background: var(--ink);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--parchment);
-  padding: 9px 11px;
-  resize: vertical;
-}
-
-.dialog-input:focus {
-  border-color: var(--brass);
-}
-
-.dialog-textarea {
-  font-family: var(--font-body);
-  line-height: 1.45;
-}
-
-.dialog-actions {
+.acd-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-border);
+}
+
+/* inline spinner inside button */
+.btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }

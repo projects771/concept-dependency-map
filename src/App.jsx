@@ -1,120 +1,127 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
+import { useToast } from './context/ToastContext.jsx';
 import { useGraph } from './hooks/useGraph.js';
-import { DEFAULT_COURSE } from './api/api.js';
+import LandingScreen from './components/LandingScreen.jsx';
 import GraphCanvas from './components/GraphCanvas.jsx';
 import SidePanel from './components/SidePanel.jsx';
 import Toolbar from './components/Toolbar.jsx';
 import AddConceptDialog from './components/AddConceptDialog.jsx';
-import CoursePicker from './components/CoursePicker.jsx';
-import './App.css';
 
 export default function App() {
-  // courseId drives the graph — null means "show course picker"
+  const toast = useToast();
+
+  // ── session state ──────────────────────────────────────────────
   const [course,         setCourse]         = useState(null);
+  const [role,           setRole]           = useState(null);   // 'student' | 'educator'
   const [mode,           setMode]           = useState('educator');
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [addDialog,      setAddDialog]      = useState({ open: false, position: { x: 0, y: 0 } });
 
   const courseId = course?.id ?? null;
-  const graph    = useGraph(courseId);
+  const graph    = useGraph(courseId, toast);
 
   const selectedNode = useMemo(
-    () => graph.nodes.find((n) => n.id === selectedNodeId) || null,
+    () => graph.nodes.find((n) => n.id === selectedNodeId) ?? null,
     [graph.nodes, selectedNodeId]
   );
 
-  // ── event handlers ────────────────────────────────────────────────────────
-
-  const handleCourseSelect = useCallback((c) => setCourse(c), []);
+  // ── landing callbacks ──────────────────────────────────────────
+  const handleEnter = useCallback((c, r) => {
+    setCourse(c);
+    setRole(r);
+    setMode(r === 'student' ? 'student' : 'educator');
+    toast.success(`Opened "${c.title}"`);
+  }, [toast]);
 
   const handleBackToCourses = useCallback(() => {
     setCourse(null);
+    setRole(null);
     setSelectedNodeId(null);
   }, []);
 
-  const handleModeChange  = useCallback((next) => setMode(next), []);
-  const handleNodeClick   = useCallback((_e, node) => setSelectedNodeId(node.id), []);
-  const handleClosePanel  = useCallback(() => setSelectedNodeId(null), []);
-
-  const handleNodeDragStop = useCallback(
-    (_e, node) => graph.persistNodePosition(node.id, node.position),
-    [graph]
-  );
-
-  const handleConnect    = useCallback((conn) => graph.addEdgeBetween(conn.source, conn.target), [graph]);
-  const handleEdgesDelete = useCallback((del) => graph.removeEdges(del), [graph]);
-
-  const handleNodesDelete = useCallback(
-    (deleted) => {
-      deleted.forEach((n) => graph.removeConcept(n.id));
-      if (deleted.some((n) => n.id === selectedNodeId)) setSelectedNodeId(null);
-    },
-    [graph, selectedNodeId]
-  );
-
-  const handleRequestAddConcept = useCallback((position) => {
-    setAddDialog({ open: true, position });
-  }, []);
+  // ── toolbar callbacks ──────────────────────────────────────────
+  const handleModeChange = useCallback((next) => setMode(next), []);
 
   const handleAddConceptFromToolbar = useCallback(() => {
     const jitter = () => Math.round(Math.random() * 160 - 80);
     setAddDialog({ open: true, position: { x: 480 + jitter(), y: 260 + jitter() } });
   }, []);
 
-  const handleAddSubmit = useCallback(
-    async (formData) => {
-      await graph.addConcept(formData, addDialog.position);
-      setAddDialog({ open: false, position: { x: 0, y: 0 } });
-    },
-    [graph, addDialog.position]
-  );
+  // ── canvas callbacks ───────────────────────────────────────────
+  const handleNodeClick = useCallback((_e, node) => setSelectedNodeId(node.id), []);
+  const handleClosePanel = useCallback(() => setSelectedNodeId(null), []);
 
-  const handleAddCancel = useCallback(() => {
-    setAddDialog({ open: false, position: { x: 0, y: 0 } });
+  const handleNodeDragStop = useCallback(
+    (_e, node) => graph.persistNodePosition(node.id, node.position), [graph]);
+
+  const handleConnect = useCallback(
+    (conn) => graph.addEdgeBetween(conn.source, conn.target), [graph]);
+
+  const handleEdgesDelete = useCallback(
+    (deleted) => graph.removeEdges(deleted), [graph]);
+
+  const handleNodesDelete = useCallback(
+    (deleted) => {
+      deleted.forEach((n) => graph.removeConcept(n.id));
+      if (deleted.some((n) => n.id === selectedNodeId)) setSelectedNodeId(null);
+    }, [graph, selectedNodeId]);
+
+  const handleRequestAddConcept = useCallback((position) => {
+    setAddDialog({ open: true, position });
   }, []);
 
+  // ── add concept dialog ─────────────────────────────────────────
+  const handleAddSubmit = useCallback(async (formData) => {
+    const node = await graph.addConcept(formData, addDialog.position);
+    if (node) {
+      toast.success(`"${formData.title}" added to the map`);
+      setAddDialog({ open: false, position: { x: 0, y: 0 } });
+    }
+  }, [graph, addDialog.position, toast]);
+
+  const handleAddCancel = useCallback(() =>
+    setAddDialog({ open: false, position: { x: 0, y: 0 } }), []);
+
+  // ── mastery / delete ───────────────────────────────────────────
   const handleMasteryChange = useCallback(
-    (id, status) => graph.setMastery(id, status),
-    [graph]
-  );
+    (id, status) => graph.setMastery(id, status), [graph]);
 
-  const handleDeleteConcept = useCallback(
-    (id) => {
-      graph.removeConcept(id);
-      setSelectedNodeId(null);
-    },
-    [graph]
-  );
+  const handleDeleteConcept = useCallback((id) => {
+    const node = graph.nodes.find((n) => n.id === id);
+    graph.removeConcept(id);
+    setSelectedNodeId(null);
+    if (node) toast.info(`"${node.data.title}" removed`);
+  }, [graph, toast]);
 
-  // ── render ────────────────────────────────────────────────────────────────
-
+  // ── render ─────────────────────────────────────────────────────
   return (
     <div className="app-shell">
-      <div className="contour-field" />
-      <div className="contour-vignette" />
+      {/* animated background field */}
+      <div className="bg-field" aria-hidden="true" />
 
-      {/* Course picker — shown until a course is selected */}
-      {!courseId && <CoursePicker onSelect={handleCourseSelect} />}
+      {/* landing (role + course picker) */}
+      {!courseId && <LandingScreen onEnter={handleEnter} />}
 
-      {/* Graph view — mounted only when a course is active */}
+      {/* graph view */}
       {courseId && (
         <>
           <Toolbar
             mode={mode}
+            role={role}
             course={course}
             onModeChange={handleModeChange}
             onAddConcept={handleAddConceptFromToolbar}
             onBackToCourses={handleBackToCourses}
             saving={graph.saving}
-            error={graph.error}
-            onDismissError={graph.dismissError}
           />
 
           {graph.loading ? (
-            <div className="app-loading">
-              <div className="app-loading-spinner" />
-              <div className="font-mono app-loading-text">Charting the map…</div>
+            <div className="loading-screen animate-fade-in">
+              <div className="spinner" />
+              <span className="t-mono" style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
+                Loading map…
+              </span>
             </div>
           ) : (
             <ReactFlowProvider>

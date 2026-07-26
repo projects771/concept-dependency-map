@@ -1,220 +1,307 @@
 /* ============================================================
-   Waypoint — design tokens
-   A field-guide / trail-map metaphor for prerequisite learning:
-   concepts are waypoints, dependencies are trails, and a student
-   who is "struggling" is a hiker who has lost the path.
+   Waypoint Design System
+   Minimal, professional SaaS aesthetic — Linear/Vercel inspired
    ============================================================ */
 
 :root {
-  /* color */
-  --ink: #11161a;
-  --ink-soft: #161d22;
-  --ink-elevated: #1d262c;
-  --ink-elevated-2: #232e34;
+  /* -- Neutrals ------------------------------------------------- */
+  --c-bg:          #0a0a0b;
+  --c-surface:     #111113;
+  --c-surface-2:   #18181c;
+  --c-surface-3:   #1e1e23;
+  --c-border:      rgba(255,255,255,0.07);
+  --c-border-2:    rgba(255,255,255,0.12);
 
-  --parchment: #ece4d3;
-  --parchment-dim: #b6ac98;
-  --parchment-faint: #7c7567;
+  /* -- Text ----------------------------------------------------- */
+  --c-text:        #e8e8ea;
+  --c-text-2:      #9494a0;
+  --c-text-3:      #5a5a68;
+  --c-text-inv:    #0a0a0b;
 
-  --moss: #84a08a;
-  --moss-dim: #4f6354;
-  --brass: #cd9c4f;
-  --brass-dim: #7a5e34;
-  --rust: #c45a3c;
-  --rust-dim: #6e3527;
+  /* -- Brand / accent ------------------------------------------- */
+  --c-accent:      #7c6af7;   /* indigo-violet */
+  --c-accent-dim:  #4a3fa3;
+  --c-accent-glow: rgba(124,106,247,0.18);
 
-  --trail: #6a8478;
-  --trail-dim: #2c3631;
+  /* -- Mastery states ------------------------------------------- */
+  --c-confident:   #34d399;   /* emerald */
+  --c-learning:    #fbbf24;   /* amber */
+  --c-struggling:  #f87171;   /* red */
 
-  --line-faint: rgba(236, 228, 211, 0.07);
-  --line-soft: rgba(236, 228, 211, 0.14);
+  /* -- Semantic ------------------------------------------------- */
+  --c-success:     #34d399;
+  --c-warning:     #fbbf24;
+  --c-error:       #f87171;
+  --c-info:        #60a5fa;
 
-  /* type */
-  --font-display: 'Fraunces', 'Iowan Old Style', serif;
-  --font-body: 'Archivo', 'Helvetica Neue', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  /* -- Typography ----------------------------------------------- */
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Fraunces', 'Georgia', serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
 
-  /* layout */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --shadow-deep: 0 12px 40px rgba(0, 0, 0, 0.45);
+  /* -- Spacing scale -------------------------------------------- */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* -- Radius --------------------------------------------------- */
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  16px;
+  --r-xl:  24px;
+  --r-full: 9999px;
+
+  /* -- Shadow --------------------------------------------------- */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-xl:  0 24px 64px rgba(0,0,0,0.7);
+  --shadow-accent: 0 0 0 1px var(--c-accent), 0 0 20px var(--c-accent-glow);
+
+  /* -- Transition ---------------------------------------------- */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --t-fast: 120ms;
+  --t-base: 200ms;
+  --t-slow: 350ms;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
+html, body, #root { height: 100%; }
 
 body {
-  font-family: var(--font-body);
-  color: var(--parchment);
-  background-color: var(--ink);
-  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-text);
+  background: var(--c-bg);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
-/* ---------- signature element: topographic contour field ----------
-   Two offset layers of hand-drawn-feeling contour lines, each an
-   inline SVG tile, drifting at different speeds to suggest a map
-   that is alive underfoot. Disabled entirely for reduced-motion. */
-
-.contour-field {
+/* ── Contour background ────────────────────────────────────── */
+.bg-field {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(124,106,247,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(52,211,153,0.04) 0%, transparent 55%),
+    var(--c-bg);
 }
 
-.contour-field::before,
-.contour-field::after {
+.bg-field::before {
   content: '';
   position: absolute;
-  inset: -10%;
+  inset: -5%;
   background-repeat: repeat;
-  background-size: 560px 560px;
-  opacity: 0.5;
+  background-size: 520px 520px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'%3E%3Cpath d='M-20 80C80 30 160 130 280 80S440 30 560 90'/%3E%3Cpath d='M-20 160C90 110 160 210 290 160S450 110 560 170'/%3E%3Cpath d='M-20 250C70 190 200 290 300 240S460 190 560 260'/%3E%3Cpath d='M-20 340C100 290 170 380 310 330S460 280 560 350'/%3E%3Cpath d='M-20 430C90 380 210 460 320 420S470 370 560 440'/%3E%3C/g%3E%3C/svg%3E");
+  animation: contour-drift 80s linear infinite;
 }
 
-.contour-field::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cg fill='none' stroke='%232c3631' stroke-width='1.1'%3E%3Cpath d='M-20 60 C 80 10, 160 110, 260 60 S 420 10, 580 70'/%3E%3Cpath d='M-20 130 C 90 80, 150 180, 270 130 S 430 80, 580 140'/%3E%3Cpath d='M-20 210 C 70 150, 190 260, 290 200 S 440 150, 580 220'/%3E%3Cpath d='M-20 300 C 100 250, 170 350, 300 290 S 450 240, 580 310'/%3E%3Cpath d='M-20 390 C 90 340, 200 430, 310 380 S 460 330, 580 400'/%3E%3Cpath d='M-20 470 C 110 420, 210 500, 330 460 S 470 410, 580 480'/%3E%3C/g%3E%3C/svg%3E");
-  animation: drift-slow 90s linear infinite;
-}
-
-.contour-field::after {
-  background-size: 380px 380px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='380' viewBox='0 0 380 380'%3E%3Cg fill='none' stroke='%23394742' stroke-width='0.8'%3E%3Cpath d='M-10 40 C 60 5, 110 75, 190 40 S 310 5, 400 45'/%3E%3Cpath d='M-10 110 C 70 75, 120 145, 200 110 S 320 75, 400 115'/%3E%3Cpath d='M-10 190 C 50 150, 140 230, 210 185 S 330 150, 400 195'/%3E%3Cpath d='M-10 270 C 80 235, 150 305, 220 265 S 340 230, 400 275'/%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.35;
-  animation: drift-fast 60s linear infinite reverse;
-}
-
-@keyframes drift-slow {
-  from {
-    transform: translate(0, 0);
-  }
-  to {
-    transform: translate(-560px, -280px);
-  }
-}
-
-@keyframes drift-fast {
-  from {
-    transform: translate(0, 0);
-  }
-  to {
-    transform: translate(380px, -380px);
-  }
-}
-
-/* a faint radial "lamplight" so the canvas centre reads as the
-   focal clearing on the map */
-.contour-vignette {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(
-      ellipse 70% 60% at 50% 38%,
-      rgba(205, 156, 79, 0.05),
-      transparent 60%
-    ),
-    radial-gradient(ellipse 120% 90% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+@keyframes contour-drift {
+  to { transform: translate(-520px, -260px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .contour-field::before,
-  .contour-field::after {
-    animation: none;
-  }
+  .bg-field::before { animation: none; }
 }
 
-/* ---------- shared utility ---------- */
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-surface-3); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--c-border-2); }
 
-.font-display {
-  font-family: var(--font-display);
-}
-
-.font-mono {
-  font-family: var(--font-mono);
-}
-
-button {
-  font-family: inherit;
-}
-
-button:focus-visible,
-[tabindex]:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--brass);
+/* ── Focus ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
   outline-offset: 2px;
+  border-radius: var(--r-sm);
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+/* ── Typography ────────────────────────────────────────────── */
+.t-display { font-family: var(--font-serif); font-weight: 500; }
+.t-mono    { font-family: var(--font-mono); }
+.t-label   { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 600; }
+.t-muted   { color: var(--c-text-2); }
+.t-faint   { color: var(--c-text-3); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--ink-elevated-2);
-  border-radius: 6px;
-}
-
+/* ── Base button ───────────────────────────────────────────── */
 .btn {
-  font-family: var(--font-body);
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-sans);
   font-size: 13px;
-  letter-spacing: 0.02em;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line-soft);
-  background: var(--ink-elevated);
-  color: var(--parchment);
+  font-weight: 500;
+  line-height: 1;
   padding: 8px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.08s ease;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+  user-select: none;
 }
 
-.btn:hover {
-  border-color: var(--trail);
-  background: var(--ink-elevated-2);
-}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-.btn:active {
-  transform: translateY(1px);
-}
-
+/* variants */
 .btn-primary {
-  background: var(--brass-dim);
-  border-color: var(--brass);
-  color: var(--parchment);
+  background: var(--c-accent);
+  color: #fff;
+  border-color: var(--c-accent);
+}
+.btn-primary:hover {
+  background: #8b7af9;
+  border-color: #8b7af9;
+  box-shadow: 0 0 16px var(--c-accent-glow);
 }
 
-.btn-primary:hover {
-  background: var(--brass);
-  color: var(--ink);
+.btn-secondary {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  border-color: var(--c-border);
+}
+.btn-secondary:hover {
+  background: var(--c-surface-3);
+  border-color: var(--c-border-2);
 }
 
 .btn-ghost {
   background: transparent;
+  color: var(--c-text-2);
   border-color: transparent;
 }
-
 .btn-ghost:hover {
-  background: var(--line-faint);
+  background: var(--c-surface-2);
+  color: var(--c-text);
 }
 
-.btn[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
+.btn-danger {
+  background: transparent;
+  color: var(--c-error);
+  border-color: rgba(248,113,113,0.3);
+}
+.btn-danger:hover {
+  background: rgba(248,113,113,0.1);
+  border-color: var(--c-error);
+}
+
+.btn-sm { font-size: 12px; padding: 5px 10px; }
+.btn-lg { font-size: 14px; padding: 10px 18px; }
+
+/* ── Input ─────────────────────────────────────────────────── */
+.input {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+  transition: border-color var(--t-fast) var(--ease);
+}
+
+.input::placeholder { color: var(--c-text-3); }
+.input:focus { outline: none; border-color: var(--c-accent); box-shadow: 0 0 0 3px var(--c-accent-glow); }
+
+textarea.input { resize: vertical; line-height: 1.5; }
+
+/* ── Card ──────────────────────────────────────────────────── */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Badge ─────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  letter-spacing: 0.03em;
+}
+
+.badge-confident { background: rgba(52,211,153,0.12); color: var(--c-confident); }
+.badge-learning  { background: rgba(251,191,36,0.12);  color: var(--c-learning); }
+.badge-struggling{ background: rgba(248,113,113,0.12); color: var(--c-struggling); }
+.badge-accent    { background: var(--c-accent-glow);   color: var(--c-accent); }
+
+/* ── Skeleton loader ───────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--c-surface-2) 25%, var(--c-surface-3) 50%, var(--c-surface-2) 75%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--r-sm);
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Fade/slide animations ─────────────────────────────────── */
+@keyframes fade-in    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up   { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slide-down { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slide-right{ from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes scale-in   { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.animate-fade-in  { animation: fade-in var(--t-base) var(--ease) both; }
+.animate-slide-up { animation: slide-up var(--t-slow) var(--ease) both; }
+.animate-scale-in { animation: scale-in var(--t-base) var(--ease) both; }
+
+/* ── App shell ─────────────────────────────────────────────── */
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Loading screen ────────────────────────────────────────── */
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--c-border);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--c-accent); }
+  @keyframes skeleton-shimmer { 0%, 100% { background-position: 0% 50%; } }
 }

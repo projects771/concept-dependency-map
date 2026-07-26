@@ -1,79 +1,86 @@
-.graph-canvas-wrapper {
+.gc-wrapper {
   position: absolute;
   inset: 0;
   z-index: 2;
 }
 
-.react-flow {
-  background: transparent;
+.react-flow { background: transparent; }
+
+/* ── trail edges ── */
+.trail-path {
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  animation: trail-march 28s linear infinite;
 }
 
-/* trail edges: dashed path with a slow marching-ants drift, like a
-   route drawn in pencil across the map */
-.trail-edge-path {
-  stroke: var(--trail);
-  stroke-width: 1.6;
-  stroke-dasharray: 6 5;
-  animation: trail-march 26s linear infinite;
-}
-
-.trail-edge-path.is-selected {
-  stroke: var(--brass);
-  stroke-width: 2.2;
+.trail-path.is-selected {
+  stroke: var(--c-accent);
+  stroke-width: 2;
+  stroke-dasharray: none;
 }
 
 @keyframes trail-march {
-  to {
-    stroke-dashoffset: -400;
-  }
+  to { stroke-dashoffset: -360; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .trail-edge-path {
-    animation: none;
-  }
-}
-
-.react-flow__edge-path {
-  stroke: var(--trail);
-}
-
-.react-flow__selection {
-  background: rgba(205, 156, 79, 0.08);
-  border: 1px dashed var(--brass);
-}
-
-/* controls */
+/* ── controls ── */
 .react-flow__controls {
-  box-shadow: var(--shadow-deep);
-  border-radius: var(--radius-md);
+  border-radius: var(--r-md);
   overflow: hidden;
-  border: 1px solid var(--line-soft);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-md);
 }
 
 .react-flow__controls-button {
-  background: var(--ink-elevated);
-  border-bottom: 1px solid var(--line-faint);
-  fill: var(--parchment);
-  color: var(--parchment);
+  background: var(--c-surface-2) !important;
+  border-bottom: 1px solid var(--c-border) !important;
+  fill: var(--c-text-2) !important;
 }
-
 .react-flow__controls-button:hover {
-  background: var(--ink-elevated-2);
+  background: var(--c-surface-3) !important;
+  fill: var(--c-text) !important;
 }
 
-/* minimap, styled like a small inset "you are here" map */
+/* ── minimap ── */
 .react-flow__minimap {
-  background: var(--ink-soft);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line-soft);
-  box-shadow: var(--shadow-deep);
+  background: var(--c-surface) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
-.react-flow__attribution {
-  display: none;
+.react-flow__minimap-mask {
+  fill: rgba(10,10,11,0.7) !important;
 }
 
-.react-flow__node {
-  z-index: 5;
+/* ── selection ── */
+.react-flow__selection {
+  background: rgba(124,106,247,0.08) !important;
+  border: 1px dashed var(--c-accent) !important;
+}
+
+.react-flow__attribution { display: none; }
+
+/* ── educator mode hint overlay ── */
+.gc-hint {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17,17,19,0.8);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-full);
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--c-text-3);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  animation: fade-in 0.6s 1.5s var(--ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-path { animation: none; }
+  .gc-hint { animation: none; opacity: 1; }
 }
