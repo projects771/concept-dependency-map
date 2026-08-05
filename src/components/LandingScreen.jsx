@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import './LandingScreen.css';
 
-const ROLES = [
-  {
-    id: 'student',
-    icon: '◎',
-    label: 'Student',
-    desc: 'Explore concepts, track mastery, see where you are on the map.',
-  },
-  {
-    id: 'educator',
-    icon: '◈',
-    label: 'Educator',
-    desc: 'Build and edit concept maps, define dependencies, manage courses.',
-  },
-];
+// Demo EID. Replace with real backend auth check when Person B adds it.
+const VALID_EID = 'EID-2024';
 
 export default function LandingScreen({ onEnter }) {
   const toast = useToast();
-  const [role,        setRole]        = useState(null);   // null → show role picker
+
+  // Step 1: pick role → 'student' | 'educator'
+  // Step 2 (educator only): enter EID → verified: boolean
+  // Step 3: view/create courses
+  const [step,        setStep]        = useState('pick-role'); // 'pick-role' | 'verify-eid' | 'courses'
+  const [role,        setRole]        = useState(null);
+  const [eid,         setEid]         = useState('');
+  const [eidError,    setEidError]    = useState('');
   const [courses,     setCourses]     = useState([]);
   const [loading,     setLoading]     = useState(false);
   const [creating,    setCreating]    = useState(false);
   const [showForm,    setShowForm]    = useState(false);
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
+  const eidRef = useRef(null);
 
+  // Load courses once we reach the 'courses' step
   useEffect(() => {
-    if (!role) return;
+    if (step !== 'courses') return;
     let alive = true;
     setLoading(true);
     api.fetchCourses()
@@ -37,7 +34,30 @@ export default function LandingScreen({ onEnter }) {
       .catch((e)  => { if (alive) toast.error(`Could not load courses: ${e.message}`); })
       .finally(()  => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [role]);
+  }, [step]);
+
+  useEffect(() => {
+    if (step === 'verify-eid') setTimeout(() => eidRef.current?.focus(), 60);
+  }, [step]);
+
+  function handleRolePick(r) {
+    setRole(r);
+    if (r === 'educator') {
+      setStep('verify-eid');
+    } else {
+      setStep('courses');
+    }
+  }
+
+  function handleEidSubmit(e) {
+    e.preventDefault();
+    setEidError('');
+    if (eid.trim().toUpperCase() !== VALID_EID) {
+      setEidError('Invalid Educator ID. Please check and try again.');
+      return;
+    }
+    setStep('courses');
+  }
 
   async function handleCreate(e) {
     e.preventDefault();
@@ -53,59 +73,126 @@ export default function LandingScreen({ onEnter }) {
     }
   }
 
-  /* ── role selection ── */
-  if (!role) {
+  function handleBack() {
+    setStep('pick-role');
+    setRole(null);
+    setEid('');
+    setEidError('');
+    setCourses([]);
+    setShowForm(false);
+    setTitle('');
+    setDescription('');
+  }
+
+  /* ── Step 1: Role picker ── */
+  if (step === 'pick-role') {
     return (
       <div className="ls-shell">
         <div className="ls-card animate-slide-up">
           <div className="ls-logo t-mono">◈ waypoint</div>
           <h1 className="ls-headline t-display">Welcome back.</h1>
-          <p className="ls-sub">How are you using the map today?</p>
+          <p className="ls-sub">How are you joining today?</p>
 
           <div className="ls-roles">
-            {ROLES.map((r) => (
-              <button key={r.id} className="ls-role-btn" onClick={() => setRole(r.id)}>
-                <span className="ls-role-icon">{r.icon}</span>
-                <div className="ls-role-text">
-                  <div className="ls-role-label">{r.label}</div>
-                  <div className="ls-role-desc">{r.desc}</div>
-                </div>
-                <span className="ls-role-arrow">→</span>
-              </button>
-            ))}
+            <button className="ls-role-btn" onClick={() => handleRolePick('student')}>
+              <span className="ls-role-icon ls-role-icon--student">◎</span>
+              <div className="ls-role-text">
+                <div className="ls-role-label">Student</div>
+                <div className="ls-role-desc">Explore concepts, track your mastery, navigate the map.</div>
+              </div>
+              <span className="ls-role-arrow">→</span>
+            </button>
+
+            <button className="ls-role-btn" onClick={() => handleRolePick('educator')}>
+              <span className="ls-role-icon ls-role-icon--educator">◈</span>
+              <div className="ls-role-text">
+                <div className="ls-role-label">Educator</div>
+                <div className="ls-role-desc">Build concept maps, manage courses, define dependencies.</div>
+              </div>
+              <span className="ls-role-arrow">→</span>
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  /* ── course list ── */
-  const currentRole = ROLES.find((r) => r.id === role);
+  /* ── Step 2: Educator EID verification ── */
+  if (step === 'verify-eid') {
+    return (
+      <div className="ls-shell">
+        <div className="ls-card animate-slide-up">
+          <div className="ls-logo t-mono">◈ waypoint</div>
+          <button className="ls-back-btn btn btn-ghost btn-sm" onClick={handleBack}>← Back</button>
+
+          <h1 className="ls-headline t-display">Educator access</h1>
+          <p className="ls-sub">Enter your Educator ID to continue.</p>
+
+          <form className="ls-eid-form" onSubmit={handleEidSubmit}>
+            <div className="ls-field">
+              <label className="ls-field-label t-label t-faint" htmlFor="eid-input">
+                Educator ID (EID)
+              </label>
+              <input
+                ref={eidRef}
+                id="eid-input"
+                className={`input ls-eid-input ${eidError ? 'input--error' : ''}`}
+                placeholder="e.g. EID-2024"
+                value={eid}
+                onChange={(e) => { setEid(e.target.value); setEidError(''); }}
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {eidError && (
+                <div className="ls-field-error animate-slide-down">{eidError}</div>
+              )}
+            </div>
+
+            <button type="submit" className="btn btn-primary ls-eid-submit" disabled={!eid.trim()}>
+              Verify &amp; continue →
+            </button>
+          </form>
+
+          <div className="ls-eid-hint t-faint">
+            Demo EID: <code className="t-mono">EID-2024</code>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Step 3: Course list ── */
+  const roleLabel = role === 'educator' ? 'Educator' : 'Student';
+  const roleIcon  = role === 'educator' ? '◈' : '◎';
 
   return (
     <div className="ls-shell">
       <div className="ls-card animate-slide-up">
-        {/* header */}
+        {/* header — NO "Switch role" button (role is permanent per session) */}
         <div className="ls-course-header">
           <div>
             <div className="ls-logo t-mono">◈ waypoint</div>
             <h1 className="ls-headline t-display">Choose your map</h1>
             <p className="ls-sub">
-              Signed in as <span className="ls-role-pill">{currentRole.icon} {currentRole.label}</span>
+              Signed in as{' '}
+              <span className={`ls-role-pill ls-role-pill--${role}`}>
+                {roleIcon} {roleLabel}
+              </span>
             </p>
           </div>
-          <button className="btn btn-ghost btn-sm ls-switch-role" onClick={() => { setRole(null); setCourses([]); }}>
-            Switch role
+          {/* Back to role picker — but label it clearly */}
+          <button className="btn btn-ghost btn-sm ls-switch-role" onClick={handleBack}>
+            ← Sign out
           </button>
         </div>
 
-        {/* course list */}
+        {/* courses */}
         {loading ? (
           <div className="ls-skeleton-list">
             {[1,2,3].map((i) => (
               <div key={i} className="ls-skeleton-item">
-                <div className="skeleton" style={{ width: '60%', height: 16 }} />
-                <div className="skeleton" style={{ width: '40%', height: 12, marginTop: 6 }} />
+                <div className="skeleton" style={{ width: '55%', height: 15 }} />
+                <div className="skeleton" style={{ width: '38%', height: 11, marginTop: 7 }} />
               </div>
             ))}
           </div>
@@ -129,43 +216,50 @@ export default function LandingScreen({ onEnter }) {
           <div className="ls-empty">
             <div className="ls-empty-icon">◎</div>
             <div className="ls-empty-title">No courses yet</div>
-            <div className="ls-empty-sub">Create your first concept map below.</div>
+            <div className="ls-empty-sub">
+              {role === 'educator'
+                ? 'Create your first concept map below.'
+                : 'Ask your educator to create a course.'}
+            </div>
           </div>
         )}
 
-        <div className="ls-divider" />
-
-        {/* create form */}
-        {showForm ? (
-          <form className="ls-form animate-slide-up" onSubmit={handleCreate}>
-            <div className="t-label t-muted" style={{ marginBottom: 10 }}>New course</div>
-            <input
-              className="input"
-              placeholder="Course title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              autoFocus
-              required
-            />
-            <textarea
-              className="input"
-              style={{ marginTop: 8, minHeight: 72 }}
-              placeholder="Short description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-            />
-            <div className="ls-form-actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
-              <button type="submit"  className="btn btn-primary" disabled={!title.trim() || creating}>
-                {creating ? 'Creating…' : 'Create & open'}
+        {/* create form — educators only */}
+        {role === 'educator' && (
+          <>
+            <div className="ls-divider" />
+            {showForm ? (
+              <form className="ls-form animate-slide-up" onSubmit={handleCreate}>
+                <div className="t-label t-faint" style={{ marginBottom: 10, letterSpacing: '0.07em', fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>New course</div>
+                <input
+                  className="input"
+                  placeholder="Course title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  autoFocus
+                  required
+                />
+                <textarea
+                  className="input"
+                  style={{ marginTop: 8, minHeight: 72 }}
+                  placeholder="Short description (optional)"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={2}
+                />
+                <div className="ls-form-actions">
+                  <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button type="submit" className="btn btn-primary" disabled={!title.trim() || creating}>
+                    {creating ? 'Creating…' : 'Create & open'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button className="btn btn-secondary" style={{ alignSelf: 'flex-start' }} onClick={() => setShowForm(true)}>
+                + New course
               </button>
-            </div>
-          </form>
-        ) : (
-          <button className="btn btn-secondary" style={{ alignSelf: 'flex-start' }} onClick={() => setShowForm(true)}>
-            + New course
-          </button>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -123,3 +123,13 @@
 @media (prefers-reduced-motion: reduce) {
   .cn-risk-badge { animation: none; }
 }
+
+/* Educator view — neutral, no mastery colour */
+.cn--educator {
+  --mastery-dot: var(--c-text-3);
+  border-left-color: var(--c-border-2);
+}
+
+.cn--educator .cn-title {
+  font-size: 13.5px; /* slightly larger since there's no status line below */
+}

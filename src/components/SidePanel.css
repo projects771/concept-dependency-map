@@ -251,3 +251,57 @@
 @media (prefers-reduced-motion: reduce) {
   .sp { transition: none; }
 }
+
+/* ── Resource links ── */
+.sp-resource-item--link {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast);
+}
+
+.sp-resource-item--link:hover {
+  border-color: var(--c-accent);
+  background: rgba(124,106,247,0.04);
+}
+
+.sp-resource-link-icon {
+  font-size: 11px;
+  color: var(--c-accent);
+  flex-shrink: 0;
+  margin-top: 3px;
+  font-weight: 700;
+}
+
+.sp-resource-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  min-width: 0;
+  flex: 1;
+}
+
+.sp-resource-link:hover .sp-resource-link-name {
+  color: var(--c-accent);
+}
+
+.sp-resource-link-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-text);
+  transition: color var(--t-fast);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-resource-link-host {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

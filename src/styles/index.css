@@ -88,26 +88,49 @@ body {
   overflow: hidden;
 }
 
-/* ── Contour background ────────────────────────────────────── */
+/* ── Background field ──────────────────────────────────────── */
 .bg-field {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(124,106,247,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(52,211,153,0.04) 0%, transparent 55%),
-    var(--c-bg);
+  background: var(--c-bg);
+  overflow: hidden;
 }
 
+/* Slow-breathing radial gradient blobs */
 .bg-field::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 15% 35%, rgba(124,106,247,0.08) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 35% at 85% 72%, rgba(52,211,153,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 60% 10%,  rgba(96,165,250,0.04) 0%, transparent 50%);
+  animation: blob-breathe 12s ease-in-out infinite alternate;
+}
+
+/* Topographic contour lines */
+.bg-field::after {
   content: '';
   position: absolute;
   inset: -5%;
   background-repeat: repeat;
   background-size: 520px 520px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'%3E%3Cpath d='M-20 80C80 30 160 130 280 80S440 30 560 90'/%3E%3Cpath d='M-20 160C90 110 160 210 290 160S450 110 560 170'/%3E%3Cpath d='M-20 250C70 190 200 290 300 240S460 190 560 260'/%3E%3Cpath d='M-20 340C100 290 170 380 310 330S460 280 560 350'/%3E%3Cpath d='M-20 430C90 380 210 460 320 420S470 370 560 440'/%3E%3C/g%3E%3C/svg%3E");
-  animation: contour-drift 80s linear infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='520'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.022)' stroke-width='1'%3E%3Cpath d='M-20 80C80 30 160 130 280 80S440 30 560 90'/%3E%3Cpath d='M-20 160C90 110 160 210 290 160S450 110 560 170'/%3E%3Cpath d='M-20 250C70 190 200 290 300 240S460 190 560 260'/%3E%3Cpath d='M-20 340C100 290 170 380 310 330S460 280 560 350'/%3E%3Cpath d='M-20 430C90 380 210 460 320 420S470 370 560 440'/%3E%3C/g%3E%3C/svg%3E");
+  animation: contour-drift 90s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes blob-breathe {
+  from {
+    opacity: 0.7;
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08) translate(1%, -1%);
+  }
 }
 
 @keyframes contour-drift {
@@ -116,6 +139,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .bg-field::before { animation: none; }
+  .bg-field::after  { animation: none; }
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */

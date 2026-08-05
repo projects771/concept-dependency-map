@@ -275,3 +275,92 @@
   .ls-card { padding: var(--sp-6) var(--sp-5); }
   .ls-headline { font-size: 24px; }
 }
+
+/* ── EID verification step ── */
+.ls-back-btn {
+  margin-bottom: var(--sp-4);
+}
+
+.ls-eid-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-top: var(--sp-2);
+}
+
+.ls-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.ls-field-label {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ls-eid-input {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ls-field-error {
+  font-size: 12.5px;
+  color: var(--c-error);
+}
+
+.ls-eid-submit {
+  align-self: flex-start;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.ls-eid-hint {
+  margin-top: var(--sp-5);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ls-eid-hint code {
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: 2px 7px;
+  color: var(--c-accent);
+}
+
+/* ── Role pill variants ── */
+.ls-role-pill--educator {
+  background: var(--c-accent-glow);
+  border-color: rgba(124,106,247,0.3);
+  color: var(--c-accent);
+}
+
+.ls-role-pill--student {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.3);
+  color: var(--c-confident);
+}
+
+/* ── Role icon colours ── */
+.ls-role-icon--educator { color: var(--c-accent); }
+.ls-role-icon--student  { color: var(--c-confident); }
+
+/* ── input error state ── */
+.input--error {
+  border-color: var(--c-error) !important;
+  box-shadow: 0 0 0 3px rgba(248,113,113,0.15) !important;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slide-down var(--t-base) var(--ease) both;
+}

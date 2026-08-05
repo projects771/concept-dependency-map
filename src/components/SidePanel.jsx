@@ -1,35 +1,10 @@
 import React from 'react';
 import './SidePanel.css';
 
-/* ── mastery options (students only) ── */
 const MASTERY_OPTIONS = [
-  {
-    value: 'learning',
-    label: 'Learning',
-    icon:  '◐',
-    hint:  'Still working through this concept',
-    color: 'var(--c-learning)',
-    bg:    'rgba(251,191,36,0.08)',
-    border:'rgba(251,191,36,0.3)',
-  },
-  {
-    value: 'confident',
-    label: 'Confident',
-    icon:  '●',
-    hint:  'Got it — feeling solid on this',
-    color: 'var(--c-confident)',
-    bg:    'rgba(52,211,153,0.08)',
-    border:'rgba(52,211,153,0.3)',
-  },
-  {
-    value: 'struggling',
-    label: 'Struggling',
-    icon:  '○',
-    hint:  'Need to revisit — not clicking yet',
-    color: 'var(--c-struggling)',
-    bg:    'rgba(248,113,113,0.08)',
-    border:'rgba(248,113,113,0.3)',
-  },
+  { value: 'learning',   label: 'Learning',   icon: '◐', color: 'var(--c-learning)',   bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.3)'  },
+  { value: 'confident',  label: 'Confident',  icon: '●', color: 'var(--c-confident)',  bg: 'rgba(52,211,153,0.08)',  border: 'rgba(52,211,153,0.3)'  },
+  { value: 'struggling', label: 'Struggling', icon: '○', color: 'var(--c-struggling)', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.3)' },
 ];
 
 const RISK_COLOR = {
@@ -39,18 +14,49 @@ const RISK_COLOR = {
   safe:    'var(--c-confident)',
 };
 
-/* ── shared sub-components ── */
+/* ── helpers ── */
+
+function isUrl(str) {
+  try { return Boolean(new URL(str)); }
+  catch { return false; }
+}
+
+function getHostname(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); }
+  catch { return url; }
+}
+
+function ResourceLink({ resource, index }) {
+  if (isUrl(resource)) {
+    return (
+      <li className="sp-resource-item sp-resource-item--link">
+        <span className="sp-resource-link-icon" aria-hidden="true">↗</span>
+        <a
+          href={resource}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sp-resource-link"
+          title={resource}
+        >
+          <span className="sp-resource-link-name">{getHostname(resource)}</span>
+          <span className="sp-resource-link-host t-faint">{resource.length > 60 ? resource.slice(0, 60) + '…' : resource}</span>
+        </a>
+      </li>
+    );
+  }
+  return (
+    <li className="sp-resource-item">
+      <span className="sp-resource-dot" aria-hidden="true" />
+      <span>{resource}</span>
+    </li>
+  );
+}
+
 function PanelHeader({ node, onClose }) {
   return (
     <div className="sp-header">
-      <div className="sp-eyebrow t-mono t-faint">Concept · #{node.id}</div>
-      <button
-        className="sp-close-btn btn btn-ghost btn-sm"
-        onClick={onClose}
-        aria-label="Close panel"
-      >
-        ✕
-      </button>
+      <div className="sp-eyebrow t-mono t-faint">Concept · #{node.id.slice(0, 8)}</div>
+      <button className="sp-close-btn btn btn-ghost btn-sm" onClick={onClose} aria-label="Close panel">✕</button>
     </div>
   );
 }
@@ -83,10 +89,7 @@ function ResourcesList({ resources }) {
       <div className="sp-section-label t-label t-faint">Resources</div>
       <ul className="sp-resources">
         {resources.map((r, i) => (
-          <li key={i} className="sp-resource-item">
-            <span className="sp-resource-dot" aria-hidden="true" />
-            <span>{r}</span>
-          </li>
+          <ResourceLink key={i} resource={r} index={i} />
         ))}
       </ul>
     </section>
@@ -98,8 +101,6 @@ function EducatorPanel({ node, onClose, onDelete }) {
   return (
     <>
       <PanelHeader node={node} onClose={onClose} />
-
-      {/* scrollable content area */}
       <div className="sp-scroll-area">
         <h2 className="sp-title t-display">{node.data.title}</h2>
 
@@ -111,24 +112,17 @@ function EducatorPanel({ node, onClose, onDelete }) {
 
         <ResourcesList resources={node.data.resources} />
 
-        {/* concept metadata */}
         <section className="sp-section">
           <div className="sp-section-label t-label t-faint">Concept ID</div>
           <div className="sp-meta-value t-mono">#{node.id}</div>
         </section>
       </div>
 
-      {/* fixed action footer */}
       <div className="sp-footer">
-        <button
-          className="btn btn-danger btn-sm sp-delete-btn"
-          onClick={() => onDelete(node.id)}
-        >
+        <button className="btn btn-danger btn-sm sp-delete-btn" onClick={() => onDelete(node.id)}>
           Remove concept
         </button>
-        <p className="sp-footer-hint t-faint">
-          This will also remove all connections to this concept.
-        </p>
+        <p className="sp-footer-hint t-faint">Also removes all connections to this concept.</p>
       </div>
     </>
   );
@@ -136,46 +130,35 @@ function EducatorPanel({ node, onClose, onDelete }) {
 
 /* ── Student panel ── */
 function StudentPanel({ node, onClose, onMasteryChange }) {
-  const currentMastery = node.data.mastery || 'learning';
+  const current = node.data.mastery || 'learning';
 
   return (
     <>
       <PanelHeader node={node} onClose={onClose} />
-
-      {/* scrollable content area */}
       <div className="sp-scroll-area">
         <h2 className="sp-title t-display">{node.data.title}</h2>
 
         <GapNotice gapRisk={node.data.gapRisk} gapMeta={node.data.gapMeta} />
 
-        {node.data.description && (
-          <p className="sp-desc">{node.data.description}</p>
-        )}
+        {node.data.description && <p className="sp-desc">{node.data.description}</p>}
 
-        {/* mastery section — students only */}
+        {/* mastery — students only */}
         <section className="sp-section">
           <div className="sp-section-label t-label t-faint">Your status</div>
-          <div className="sp-mastery" role="group" aria-label="Set your mastery status">
+          <div className="sp-mastery" role="group" aria-label="Mastery status">
             {MASTERY_OPTIONS.map((opt) => {
-              const isActive = currentMastery === opt.value;
+              const active = current === opt.value;
               return (
                 <button
                   key={opt.value}
-                  className={`sp-mastery-btn ${isActive ? 'is-active' : ''}`}
-                  style={isActive ? {
-                    background:   opt.bg,
-                    borderColor:  opt.border,
-                    color:        opt.color,
-                  } : {}}
+                  className={`sp-mastery-btn ${active ? 'is-active' : ''}`}
+                  style={active ? { background: opt.bg, borderColor: opt.border, color: opt.color } : {}}
                   onClick={() => onMasteryChange(node.id, opt.value)}
-                  title={opt.hint}
-                  aria-pressed={isActive}
+                  aria-pressed={active}
                 >
-                  <span className="sp-mastery-icon" style={{ color: isActive ? opt.color : 'var(--c-text-3)' }}>
-                    {opt.icon}
-                  </span>
+                  <span style={{ color: active ? opt.color : 'var(--c-text-3)', fontSize: 14 }}>{opt.icon}</span>
                   <span className="sp-mastery-label">{opt.label}</span>
-                  {isActive && <span className="sp-mastery-check">✓</span>}
+                  {active && <span style={{ marginLeft: 'auto', fontSize: 12 }}>✓</span>}
                 </button>
               );
             })}
@@ -188,27 +171,15 @@ function StudentPanel({ node, onClose, onMasteryChange }) {
   );
 }
 
-/* ── Main export ── */
+/* ── Main ── */
 export default function SidePanel({ node, role, onClose, onMasteryChange, onDelete }) {
   const isOpen     = Boolean(node);
   const isEducator = role === 'educator';
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="sp-overlay animate-fade-in"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-
-      <aside
-        className={`sp ${isOpen ? 'sp--open' : ''}`}
-        aria-label="Concept details"
-        aria-hidden={!isOpen}
-        role="complementary"
-      >
+      {isOpen && <div className="sp-overlay animate-fade-in" onClick={onClose} aria-hidden="true" />}
+      <aside className={`sp ${isOpen ? 'sp--open' : ''}`} aria-hidden={!isOpen} role="complementary" aria-label="Concept details">
         {node && (
           isEducator
             ? <EducatorPanel node={node} onClose={onClose} onDelete={onDelete} />
