@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Machine Learning PCCST503 - Project Registration Form</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            margin: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .header h2 {
+            font-size: 18px;
+            margin: 5px 0 0 0;
+        }
+        .header h3 {
+            font-size: 16px;
+            margin: 10px 0 0 0;
+            text-decoration: underline;
+        }
+        .header p {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        td.label {
+            width: 25%;
+            vertical-align: top;
+            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #000;
+        }
+        td.value {
+            width: 75%;
+            vertical-align: top;
+            padding: 8px;
+            border: 1px solid #000;
+        }
+        .footer {
+            margin-top: 60px;
+        }
+        .footer-table td {
+            border: none;
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>DEPARTMENT OF CYBERSECURITY</h1>
+        <h2>2024-2028 BATCH</h2>
+        <h3>MACHINE LEARNING PCCST503</h3>
+        <p>Project Registration Form</p>
+    </div>
+
+    <!-- FORM DATA TABLE -->
+    <table>
+        <tr>
+            <td class="label">Team No.</td>
+            <td class="value">2</td>
+        </tr>
+        <tr>
+            <td class="label">Project Title</td>
+            <td class="value">
+                Smart USB Device Authentication and Threat Detection System Using Behavioral Machine Learning
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Abstract</td>
+            <td class="value">
+                Universal Serial Bus (USB) Human Interface Devices (HIDs) are implicitly trusted by host operating systems upon connection, a design assumption exploited by hardware-spoofing attacks such as BadUSB and USB Rubber Ducky, which disguise malicious microcontrollers as legitimate keyboards or storage devices to perform automated keystroke injection and data exfiltration undetected by conventional antivirus tools. Since spoofed devices can freely forge static identifiers such as VID/PID, descriptor matching alone is insufficient for authentication. This project proposes a Smart USB Device Authentication and Threat Detection System that performs continuous behavioral fingerprinting by jointly profiling static USB descriptors and dynamic operational behavior, including keystroke injection speed (WPM), packet timing jitter, payload entropy, and endpoint request delays, without requiring any hardware modification to peripherals. Features are preprocessed using StandardScaler and LabelEncoder, and classified using Random Forest (primary), Support Vector Machine (SVM), and Gradient Boosting Classifier, trained on 1,500 labeled benign/malicious USB session records. The system targets a classification accuracy exceeding 98%, with strong ROC-AUC and F1-scores and a low false-positive rate, offering a scalable, software-only defense against USB-based hardware spoofing threats.
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Team Members (Roll No., Names &amp; Register number)</td>
+            <td class="value">
+                &bull; Aman Mathew – 10 – MUT24CC010<br>
+                &bull; Nawal Kishore S Pai – 55 – MUT24CC055<br>
+                &bull; Meril Susan Tiju – 48 – MUT24CC048<br>
+                &bull; Sneha Ann Varghese – 70 – MUT24CC070
+            </td>
+        </tr>
+    </table>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <table class="footer-table" style="width:100%;">
+            <tr>
+                <td style="width:50%;">
+                    Name &amp; Signature of the Students:
+                </td>
+                <td style="width:50%;">
+                    Name &amp; Signature of the Guide:
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

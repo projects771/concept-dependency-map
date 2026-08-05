@@ -11,27 +11,28 @@ import AddConceptDialog from './components/AddConceptDialog.jsx';
 export default function App() {
   const toast = useToast();
 
-  // ── session state ──────────────────────────────────────────────
+  // ── session ──────────────────────────────────────────────────
+  // role is chosen once at the landing screen and NEVER changes
+  // during the session. There is no in-app toggle.
   const [course,         setCourse]         = useState(null);
-  const [role,           setRole]           = useState(null);   // 'student' | 'educator'
-  const [mode,           setMode]           = useState('educator');
+  const [role,           setRole]           = useState(null);   // 'educator' | 'student'
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [addDialog,      setAddDialog]      = useState({ open: false, position: { x: 0, y: 0 } });
 
-  const courseId = course?.id ?? null;
-  const graph    = useGraph(courseId, toast);
+  const courseId   = course?.id ?? null;
+  const isEducator = role === 'educator';
+  const graph      = useGraph(courseId, toast);
 
   const selectedNode = useMemo(
     () => graph.nodes.find((n) => n.id === selectedNodeId) ?? null,
     [graph.nodes, selectedNodeId]
   );
 
-  // ── landing callbacks ──────────────────────────────────────────
+  // ── landing ───────────────────────────────────────────────────
   const handleEnter = useCallback((c, r) => {
     setCourse(c);
     setRole(r);
-    setMode(r === 'student' ? 'student' : 'educator');
-    toast.success(`Opened "${c.title}"`);
+    toast.success(`Opened "${c.title}" as ${r}`);
   }, [toast]);
 
   const handleBackToCourses = useCallback(() => {
@@ -40,42 +41,20 @@ export default function App() {
     setSelectedNodeId(null);
   }, []);
 
-  // ── toolbar callbacks ──────────────────────────────────────────
-  const handleModeChange = useCallback((next) => setMode(next), []);
-
+  // ── educator: add concept ──────────────────────────────────────
   const handleAddConceptFromToolbar = useCallback(() => {
     const jitter = () => Math.round(Math.random() * 160 - 80);
     setAddDialog({ open: true, position: { x: 480 + jitter(), y: 260 + jitter() } });
   }, []);
 
-  // ── canvas callbacks ───────────────────────────────────────────
-  const handleNodeClick = useCallback((_e, node) => setSelectedNodeId(node.id), []);
-  const handleClosePanel = useCallback(() => setSelectedNodeId(null), []);
-
-  const handleNodeDragStop = useCallback(
-    (_e, node) => graph.persistNodePosition(node.id, node.position), [graph]);
-
-  const handleConnect = useCallback(
-    (conn) => graph.addEdgeBetween(conn.source, conn.target), [graph]);
-
-  const handleEdgesDelete = useCallback(
-    (deleted) => graph.removeEdges(deleted), [graph]);
-
-  const handleNodesDelete = useCallback(
-    (deleted) => {
-      deleted.forEach((n) => graph.removeConcept(n.id));
-      if (deleted.some((n) => n.id === selectedNodeId)) setSelectedNodeId(null);
-    }, [graph, selectedNodeId]);
-
   const handleRequestAddConcept = useCallback((position) => {
     setAddDialog({ open: true, position });
   }, []);
 
-  // ── add concept dialog ─────────────────────────────────────────
   const handleAddSubmit = useCallback(async (formData) => {
     const node = await graph.addConcept(formData, addDialog.position);
     if (node) {
-      toast.success(`"${formData.title}" added to the map`);
+      toast.success(`"${formData.title}" added`);
       setAddDialog({ open: false, position: { x: 0, y: 0 } });
     }
   }, [graph, addDialog.position, toast]);
@@ -83,10 +62,25 @@ export default function App() {
   const handleAddCancel = useCallback(() =>
     setAddDialog({ open: false, position: { x: 0, y: 0 } }), []);
 
-  // ── mastery / delete ───────────────────────────────────────────
+  // ── canvas ─────────────────────────────────────────────────────
+  const handleNodeClick   = useCallback((_e, node) => setSelectedNodeId(node.id), []);
+  const handleClosePanel  = useCallback(() => setSelectedNodeId(null), []);
+  const handleNodeDragStop = useCallback((_e, node) =>
+    graph.persistNodePosition(node.id, node.position), [graph]);
+  const handleConnect     = useCallback((conn) =>
+    graph.addEdgeBetween(conn.source, conn.target), [graph]);
+  const handleEdgesDelete = useCallback((del) =>
+    graph.removeEdges(del), [graph]);
+  const handleNodesDelete = useCallback((deleted) => {
+    deleted.forEach((n) => graph.removeConcept(n.id));
+    if (deleted.some((n) => n.id === selectedNodeId)) setSelectedNodeId(null);
+  }, [graph, selectedNodeId]);
+
+  // ── mastery (students only) ────────────────────────────────────
   const handleMasteryChange = useCallback(
     (id, status) => graph.setMastery(id, status), [graph]);
 
+  // ── educator: delete ───────────────────────────────────────────
   const handleDeleteConcept = useCallback((id) => {
     const node = graph.nodes.find((n) => n.id === id);
     graph.removeConcept(id);
@@ -97,21 +91,18 @@ export default function App() {
   // ── render ─────────────────────────────────────────────────────
   return (
     <div className="app-shell">
-      {/* animated background field */}
       <div className="bg-field" aria-hidden="true" />
 
-      {/* landing (role + course picker) */}
+      {/* Landing screen — role is chosen here and locked for the session */}
       {!courseId && <LandingScreen onEnter={handleEnter} />}
 
-      {/* graph view */}
+      {/* Graph view — only mounted after a course + role are selected */}
       {courseId && (
         <>
           <Toolbar
-            mode={mode}
             role={role}
             course={course}
-            onModeChange={handleModeChange}
-            onAddConcept={handleAddConceptFromToolbar}
+            onAddConcept={isEducator ? handleAddConceptFromToolbar : undefined}
             onBackToCourses={handleBackToCourses}
             saving={graph.saving}
           />
@@ -128,33 +119,37 @@ export default function App() {
               <GraphCanvas
                 nodes={graph.nodes}
                 edges={graph.edges}
-                mode={mode}
+                role={role}
                 onNodesChange={graph.onNodesChange}
                 onEdgesChange={graph.onEdgesChange}
                 onNodeClick={handleNodeClick}
                 onNodeDragStop={handleNodeDragStop}
-                onConnect={handleConnect}
-                onEdgesDelete={handleEdgesDelete}
-                onNodesDelete={handleNodesDelete}
-                onRequestAddConcept={handleRequestAddConcept}
+                onConnect={isEducator ? handleConnect : undefined}
+                onEdgesDelete={isEducator ? handleEdgesDelete : undefined}
+                onNodesDelete={isEducator ? handleNodesDelete : undefined}
+                onRequestAddConcept={isEducator ? handleRequestAddConcept : undefined}
               />
             </ReactFlowProvider>
           )}
 
+          {/* SidePanel gets role, not mode — shows different content per role */}
           <SidePanel
             node={selectedNode}
-            mode={mode}
+            role={role}
             onClose={handleClosePanel}
-            onMasteryChange={handleMasteryChange}
-            onDelete={handleDeleteConcept}
+            onMasteryChange={!isEducator ? handleMasteryChange : undefined}
+            onDelete={isEducator ? handleDeleteConcept : undefined}
           />
 
-          <AddConceptDialog
-            open={addDialog.open}
-            onCancel={handleAddCancel}
-            onSubmit={handleAddSubmit}
-            submitting={graph.saving}
-          />
+          {/* Add dialog — educator only */}
+          {isEducator && (
+            <AddConceptDialog
+              open={addDialog.open}
+              onCancel={handleAddCancel}
+              onSubmit={handleAddSubmit}
+              submitting={graph.saving}
+            />
+          )}
         </>
       )}
     </div>

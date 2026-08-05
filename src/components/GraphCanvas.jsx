@@ -14,7 +14,7 @@ const MASTERY_COLOR = {
 };
 
 export default function GraphCanvas({
-  nodes, edges, mode,
+  nodes, edges, role,
   onNodesChange, onEdgesChange,
   onNodeClick, onNodeDragStop,
   onConnect, onEdgesDelete, onNodesDelete,
@@ -22,10 +22,10 @@ export default function GraphCanvas({
 }) {
   const wrapperRef = useRef(null);
   const { screenToFlowPosition } = useReactFlow();
-  const isEducator = mode === 'educator';
+  const isEducator = role === 'educator';
 
   const handlePaneDoubleClick = useCallback((event) => {
-    if (!isEducator) return;
+    if (!isEducator || !onRequestAddConcept) return;
     if (event.target.closest?.('.react-flow__node')) return;
     const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
     onRequestAddConcept(position);
@@ -43,9 +43,9 @@ export default function GraphCanvas({
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         onNodeDragStop={onNodeDragStop}
-        onConnect={isEducator ? onConnect : undefined}
-        onEdgesDelete={isEducator ? onEdgesDelete : undefined}
-        onNodesDelete={isEducator ? onNodesDelete : undefined}
+        onConnect={onConnect}
+        onEdgesDelete={onEdgesDelete}
+        onNodesDelete={onNodesDelete}
         nodesDraggable={isEducator}
         nodesConnectable={isEducator}
         elementsSelectable
@@ -68,6 +68,7 @@ export default function GraphCanvas({
         />
       </ReactFlow>
 
+      {/* empty-state hint for new educator maps */}
       {isEducator && nodes.length === 0 && (
         <div className="gc-hint">
           Double-click anywhere to add your first concept

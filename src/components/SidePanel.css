@@ -1,43 +1,54 @@
-/* ── overlay (mobile tap-outside) ── */
+/* ── backdrop overlay ── */
 .sp-overlay {
   position: fixed;
   inset: 0;
   z-index: 18;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
-  animation: fade-in var(--t-fast) var(--ease) both;
 }
 
-/* ── panel ── */
+/* ── panel shell ─────────────────────────────────────────────
+   Key layout: the panel is a fixed-height flex column.
+   sp-scroll-area takes all available space and scrolls.
+   sp-footer is pinned to the bottom — never overlaps content.
+   ─────────────────────────────────────────────────────────── */
 .sp {
   position: fixed;
   top: 0;
   right: 0;
-  height: 100%;
-  width: 340px;
-  max-width: 92vw;
+  height: 100dvh;          /* full viewport height */
+  width: 320px;
+  max-width: 88vw;
   z-index: 20;
-  background: var(--c-surface);
-  border-left: 1px solid var(--c-border);
-  box-shadow: -24px 0 60px rgba(0,0,0,0.5);
+
+  /* flex column so footer stays pinned */
   display: flex;
   flex-direction: column;
-  padding: var(--sp-6) var(--sp-6) var(--sp-8);
-  overflow-y: auto;
+
+  background: var(--c-surface);
+  border-left: 1px solid var(--c-border);
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+
+  /* slide in from right */
   transform: translateX(100%);
   transition: transform var(--t-slow) var(--ease);
+
+  /* prevent content from extending outside */
+  overflow: hidden;
 }
 
 .sp--open {
   transform: translateX(0);
 }
 
-/* ── header ── */
+/* ── header (fixed at top, never scrolls) ── */
 .sp-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--sp-3);
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;           /* never compress */
 }
 
 .sp-eyebrow {
@@ -45,23 +56,48 @@
   letter-spacing: 0.07em;
 }
 
-.sp-close {
+.sp-close-btn {
   color: var(--c-text-3);
+  flex-shrink: 0;
+}
+.sp-close-btn:hover { color: var(--c-text); }
+
+/* ── scrollable content area ── */
+.sp-scroll-area {
+  flex: 1;                  /* take all remaining height */
+  overflow-y: auto;         /* scroll here, not the panel */
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 /* ── title ── */
 .sp-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--c-text);
-  line-height: 1.2;
-  margin-bottom: var(--sp-4);
+  line-height: 1.25;
+  margin-bottom: var(--sp-3);
 }
 
-/* ── gap notice ── */
+/* ── description ── */
+.sp-desc {
+  font-size: 13.5px;
+  color: var(--c-text-2);
+  line-height: 1.6;
+  margin-bottom: var(--sp-5);
+}
+
+.sp-desc--empty {
+  font-style: italic;
+  color: var(--c-text-3);
+}
+
+/* ── gap risk notice ── */
 .sp-gap-notice {
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.25);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.22);
   border-radius: var(--r-md);
   padding: var(--sp-3) var(--sp-4);
   margin-bottom: var(--sp-4);
@@ -71,7 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--c-struggling);
   margin-bottom: var(--sp-1);
@@ -84,17 +120,9 @@
 }
 
 .sp-gap-body {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--c-text-2);
   line-height: 1.45;
-}
-
-/* ── description ── */
-.sp-desc {
-  font-size: 13.5px;
-  color: var(--c-text-2);
-  line-height: 1.55;
-  margin-bottom: var(--sp-5);
 }
 
 /* ── sections ── */
@@ -104,6 +132,17 @@
 
 .sp-section-label {
   margin-bottom: var(--sp-3);
+}
+
+/* ── metadata value ── */
+.sp-meta-value {
+  font-size: 13px;
+  color: var(--c-text-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  display: inline-block;
 }
 
 /* ── resources ── */
@@ -125,6 +164,11 @@
   border: 1px solid var(--c-border);
   border-radius: var(--r-sm);
   line-height: 1.4;
+  transition: border-color var(--t-fast);
+}
+
+.sp-resource-item:hover {
+  border-color: var(--c-border-2);
 }
 
 .sp-resource-dot {
@@ -136,7 +180,7 @@
   margin-top: 5px;
 }
 
-/* ── mastery buttons ── */
+/* ── mastery buttons (students only) ── */
 .sp-mastery {
   display: flex;
   flex-direction: column;
@@ -144,47 +188,64 @@
 }
 
 .sp-mastery-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   text-align: left;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-radius: var(--r-md);
   border: 1px solid var(--c-border);
   background: var(--c-surface-2);
   color: var(--c-text-2);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
+  width: 100%;
 }
 
-.sp-mastery-btn:hover {
+.sp-mastery-btn:hover:not(.is-active) {
   border-color: var(--c-border-2);
   color: var(--c-text);
   background: var(--c-surface-3);
 }
 
-.sp-mastery-btn.is-active.sp-mastery-confident {
-  background: rgba(52,211,153,0.1);
-  border-color: rgba(52,211,153,0.4);
-  color: var(--c-confident);
+.sp-mastery-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color var(--t-fast);
 }
 
-.sp-mastery-btn.is-active.sp-mastery-learning {
-  background: rgba(251,191,36,0.1);
-  border-color: rgba(251,191,36,0.4);
-  color: var(--c-learning);
+.sp-mastery-label {
+  flex: 1;
 }
 
-.sp-mastery-btn.is-active.sp-mastery-struggling {
-  background: rgba(248,113,113,0.1);
-  border-color: rgba(248,113,113,0.4);
-  color: var(--c-struggling);
+.sp-mastery-check {
+  font-size: 12px;
+  opacity: 0.8;
 }
 
-/* ── delete ── */
-.sp-delete {
-  margin-top: auto;
+/* ── educator footer (pinned to bottom) ─────────────────────
+   NEVER overlaps scroll content — it's outside sp-scroll-area
+   ─────────────────────────────────────────────────────────── */
+.sp-footer {
+  flex-shrink: 0;           /* never compress */
+  border-top: 1px solid var(--c-border);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--c-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sp-delete-btn {
   align-self: flex-start;
+}
+
+.sp-footer-hint {
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
 @media (prefers-reduced-motion: reduce) {
