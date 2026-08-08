@@ -8,10 +8,10 @@ export default function CourseJoin() {
   const [chars, setChars] = useState(['', '', '', '', '', '']);
   const refs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
   const [validating, setValidating] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const toast = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -69,18 +69,18 @@ export default function CourseJoin() {
   const handleJoin = async () => {
     if (!isComplete) return;
     setValidating(true);
-    setError('');
+    setLocalError('');
     const courseCode = chars.join('');
     try {
       const response = await api.joinCourse(courseCode);
       if (response && (response.courseId || response.id || response._id)) {
-        showToast('Successfully joined course!', 'success');
+        toast.success('Successfully joined course!');
         navigate(`/course/${response.courseId || response.id || response._id}`);
       } else {
-        setError('Failed to join course.');
+        setLocalError('Failed to join course.');
       }
     } catch (err) {
-      setError(err.message || 'Invalid course code or error joining.');
+      setLocalError(err.message || 'Invalid course code or error joining.');
     } finally {
       setValidating(false);
     }
@@ -124,8 +124,8 @@ export default function CourseJoin() {
           ))}
         </div>
 
-        {error && (
-          <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>
+        {localError && (
+          <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{localError}</div>
         )}
 
         <button

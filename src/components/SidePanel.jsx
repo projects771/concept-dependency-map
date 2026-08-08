@@ -126,20 +126,20 @@ function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
 
         <ResourcesList resources={node.data.resources} />
 
-        <div className="add-resource">
+        <div className="add-resource" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
           <input
-            className="sp-input"
+            className="input"
             placeholder="Resource title"
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}
           />
           <input
-            className="sp-input"
+            className="input"
             placeholder="URL"
             value={newUrl}
             onChange={e => setNewUrl(e.target.value)}
           />
-          <button className="btn btn-sm" onClick={handleAddResource}>Add resource</button>
+          <button className="btn btn-secondary btn-sm" style={{ alignSelf: 'flex-start' }} onClick={handleAddResource}>Add resource</button>
         </div>
 
         <section className="sp-section">
