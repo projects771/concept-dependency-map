@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Logo from '../Logo.jsx';
 
 export default function SignIn() {
   const [searchParams] = useSearchParams();
@@ -11,65 +10,166 @@ export default function SignIn() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(null);
     setLoading(true);
+    
     try {
       const user = await login(email, password);
       if (user.role === 'educator') navigate('/dashboard');
       else navigate('/student/join');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to sign in. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogle = () => {
-    // TODO: Connect Google OAuth
-    alert('Google OAuth not yet wired up. Please use Email/Password.');
+  const handleGoogleSignIn = () => {
+    alert('Google Sign-In is not implemented yet.');
   };
 
   return (
-    <div className="ls-shell">
-      <div className="ls-card animate-slide-up">
-        <Link to="/join" className="ls-back-btn btn btn-ghost btn-sm" style={{ position: 'absolute', top: 20, left: 20 }}>← Back</Link>
-        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
-          <Logo />
+    <div className="ls-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '420px', width: '100%', padding: '40px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width={48} height={48} style={{ marginBottom: '16px' }}>
+            <rect x="0" y="0" width="52" height="52" rx="12" fill="#1D4ED8"/>
+            <circle cx="26" cy="8" r="5" fill="white" opacity="0.95"/>
+            <circle cx="8" cy="26" r="5" fill="white" opacity="0.7"/>
+            <circle cx="44" cy="26" r="5" fill="white" opacity="0.7"/>
+            <circle cx="26" cy="44" r="5" fill="white" opacity="0.5"/>
+            <line x1="26" y1="13" x2="11" y2="21" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+            <line x1="26" y1="13" x2="41" y2="21" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+            <line x1="11" y1="31" x2="21" y2="39" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+            <line x1="41" y1="31" x2="31" y2="39" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+          </svg>
+          <h1 style={{ color: 'white', fontWeight: 'bold', fontSize: '1.3rem', margin: '0 0 8px 0' }}>Sign in to Nodemap</h1>
+          <p style={{ color: 'var(--brand-accent)', margin: 0 }}>Continuing as {role}</p>
         </div>
-        <h1 className="ls-headline t-display">Sign in</h1>
-        <p className="ls-sub">Continue as {role === 'educator' ? 'Educator' : 'Student'}</p>
 
-        <button type="button" className="btn btn-secondary" style={{ width: '100%', marginBottom: 20 }} onClick={handleGoogle}>
-          Sign in with Google
+        <button 
+          type="button"
+          onClick={handleGoogleSignIn}
+          style={{ 
+            width: '100%', 
+            padding: '12px 16px', 
+            backgroundColor: 'var(--c-surface-2, #1f2937)', 
+            color: 'white', 
+            border: '1px solid var(--c-border, #374151)', 
+            borderRadius: '8px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 500,
+            marginBottom: '24px'
+          }}
+        >
+          <span style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '20px', 
+            height: '20px', 
+            borderRadius: '50%', 
+            backgroundColor: 'white', 
+            color: 'black', 
+            fontWeight: 'bold', 
+            marginRight: '12px',
+            fontSize: '14px'
+          }}>
+            G
+          </span>
+          Continue with Google
         </button>
 
-        <div style={{ textAlign: 'center', margin: '20px 0', color: 'var(--c-faint)', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.05em' }}>or use email</div>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
+          <hr style={{ flex: 1, borderColor: 'var(--c-border, #374151)', borderStyle: 'solid', borderWidth: '1px 0 0 0' }} />
+          <span style={{ color: 'var(--c-text-secondary, #9ca3af)', padding: '0 12px', fontSize: '14px' }}>or</span>
+          <hr style={{ flex: 1, borderColor: 'var(--c-border, #374151)', borderStyle: 'solid', borderWidth: '1px 0 0 0' }} />
+        </div>
 
-        <form className="ls-eid-form" onSubmit={handleSubmit}>
-          <div className="ls-field">
-            <label className="ls-field-label t-label t-faint">Email</label>
-            <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-          </div>
-          <div className="ls-field" style={{ marginTop: 12 }}>
-            <label className="ls-field-label t-label t-faint">Password</label>
-            <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-          </div>
-          
-          {error && <div className="ls-field-error" style={{ marginTop: 12 }}>{error}</div>}
+        {error && <div style={{ color: 'var(--c-error, #ef4444)', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 24 }} disabled={loading}>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label htmlFor="email" style={{ display: 'block', color: 'white', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>Email</label>
+            <input 
+              id="email"
+              type="email" 
+              placeholder="name@school.edu" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                backgroundColor: 'var(--c-surface-2, #1f2937)', 
+                border: '1px solid var(--c-border, #374151)', 
+                color: 'white', 
+                borderRadius: '8px', 
+                boxSizing: 'border-box',
+                outline: 'none',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label htmlFor="password" style={{ display: 'block', color: 'white', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>Password</label>
+            <input 
+              id="password"
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                backgroundColor: 'var(--c-surface-2, #1f2937)', 
+                border: '1px solid var(--c-border, #374151)', 
+                color: 'white', 
+                borderRadius: '8px', 
+                boxSizing: 'border-box',
+                outline: 'none',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{ 
+              width: '100%', 
+              padding: '12px 16px', 
+              backgroundColor: 'var(--brand-primary, #2563eb)', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '8px', 
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              marginBottom: '24px',
+              opacity: loading ? 0.7 : 1
+            }}
+          >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--c-faint)' }}>
-          Don't have an account? <Link to={`/register?role=${role}`} style={{ color: 'var(--c-accent)' }}>Sign up</Link>
-        </p>
+        <div style={{ textAlign: 'center', fontSize: '14px', color: 'var(--c-text-secondary, #9ca3af)' }}>
+          New to Nodemap?{' '}
+          <Link to={`/register?role=${role}`} style={{ color: 'var(--brand-primary, #3b82f6)', textDecoration: 'none', fontWeight: 500 }}>
+            Create an account
+          </Link>
+        </div>
       </div>
     </div>
   );

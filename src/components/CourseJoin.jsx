@@ -1,127 +1,172 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import Logo from './Logo.jsx';
 
 export default function CourseJoin() {
-  const { user, logout } = useAuth();
-  const toast = useToast();
-  const navigate = useNavigate();
-  
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [courseCode, setCourseCode] = useState('');
-  const [joining, setJoining] = useState(false);
+  const [chars, setChars] = useState(['', '', '', '', '', '']);
+  const refs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
+  const [validating, setValidating] = useState(false);
   const [error, setError] = useState('');
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
-    let alive = true;
-    api.fetchCourses()
-      .then(res => { if (alive) setCourses(res.courses || []); })
-      .catch(err => { if (alive) toast.error('Failed to load courses'); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, [toast]);
-
-  const handleJoin = async (e) => {
-    e.preventDefault();
-    if (!courseCode.trim() || courseCode.length !== 6) {
-      setError('Please enter a valid 6-character course code.');
-      return;
-    }
-    setJoining(true);
-    setError('');
-    try {
-      const res = await api.joinCourse(courseCode.trim());
-      if (res.courseId) {
-        toast.success(`Successfully joined course!`);
-        navigate(`/course/${res.courseId}`);
+    // Fetch enrolled courses
+    const loadCourses = async () => {
+      try {
+        const courses = await api.fetchCourses();
+        if (courses) {
+          setEnrolledCourses(courses);
+        }
+      } catch (err) {
+        console.error('Error fetching courses:', err);
       }
-    } catch (err) {
-      setError(err.message || 'Invalid course code');
-      setJoining(false);
+    };
+    if (user) {
+      loadCourses();
+    }
+  }, [user]);
+
+  const handleChange = (index, value) => {
+    const newChars = [...chars];
+    newChars[index] = value.slice(-1).toUpperCase(); // only take last char
+    setChars(newChars);
+    
+    // Auto-advance
+    if (value && index < 5) {
+      refs[index + 1].current.focus();
     }
   };
 
-  const handleSignOut = () => {
-    logout();
-    navigate('/');
+  const handleKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !chars[index] && index > 0) {
+      refs[index - 1].current.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').toUpperCase().slice(0, 6);
+    const newChars = [...chars];
+    for (let i = 0; i < pastedData.length; i++) {
+      newChars[i] = pastedData[i];
+    }
+    setChars(newChars);
+    const focusIndex = Math.min(pastedData.length, 5);
+    if (focusIndex < 6) {
+      refs[focusIndex].current.focus();
+    } else {
+      refs[5].current.focus();
+    }
+  };
+
+  const isComplete = chars.every(char => char !== '');
+
+  const handleJoin = async () => {
+    if (!isComplete) return;
+    setValidating(true);
+    setError('');
+    const courseCode = chars.join('');
+    try {
+      const response = await api.joinCourse(courseCode);
+      if (response && (response.courseId || response.id || response._id)) {
+        showToast('Successfully joined course!', 'success');
+        navigate(`/course/${response.courseId || response.id || response._id}`);
+      } else {
+        setError('Failed to join course.');
+      }
+    } catch (err) {
+      setError(err.message || 'Invalid course code or error joining.');
+    } finally {
+      setValidating(false);
+    }
   };
 
   return (
-    <div className="ls-shell">
-      <div className="ls-card animate-slide-up" style={{ minWidth: 500 }}>
-        <div className="ls-course-header">
-          <div>
-            <Logo />
-            <h1 className="ls-headline t-display" style={{ marginTop: 12 }}>My Courses</h1>
-            <p className="ls-sub">
-              Signed in as {user?.name} 
-              <span className="ls-role-pill ls-role-pill--student" style={{ marginLeft: 8 }}>◎ Student</span>
-            </p>
-          </div>
-          <button className="btn btn-ghost btn-sm ls-switch-role" onClick={handleSignOut}>
-            ← Sign out
-          </button>
+    <div className="ls-shell" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: 'var(--c-bg, #111)', padding: '20px' }}>
+      <div style={{ maxWidth: '480px', width: '100%', padding: '40px', backgroundColor: 'var(--c-surface, #1e1e1e)', borderRadius: '12px', border: '1px solid var(--c-border, #333)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔗</div>
+        <h2 style={{ color: 'var(--brand-accent, #3b82f6)', fontWeight: 'bold', fontSize: '1.3rem', marginBottom: '8px', textAlign: 'center' }}>Enter your course code</h2>
+        <p style={{ color: 'var(--c-text-muted, #9ca3af)', textAlign: 'center', marginBottom: '32px', fontSize: '0.95rem' }}>Your educator shared a 6-character code to join their course map</p>
+        
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+          {chars.map((char, index) => (
+            <input
+              key={index}
+              ref={refs[index]}
+              type="text"
+              value={char}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={handlePaste}
+              style={{
+                width: '52px',
+                height: '56px',
+                backgroundColor: 'var(--c-surface-2, #2a2a2a)',
+                border: '1px solid var(--c-border, #444)',
+                borderRadius: '8px',
+                textAlign: 'center',
+                fontSize: '22px',
+                fontWeight: '600',
+                fontFamily: 'monospace',
+                textTransform: 'uppercase',
+                color: 'var(--c-text, #fff)',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--brand-accent, #3b82f6)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--c-border, #444)'}
+            />
+          ))}
         </div>
 
-        {loading ? (
-          <div className="ls-skeleton-list">
-            <div className="ls-skeleton-item"><div className="skeleton" style={{ width: '55%', height: 15 }} /></div>
-          </div>
-        ) : courses.length > 0 ? (
-          <ul className="ls-course-list">
-            {courses.map(course => (
-              <li key={course.id} style={{ marginBottom: 12 }}>
-                <Link to={`/course/${course.id}`} className="ls-course-btn" style={{ textDecoration: 'none' }}>
-                  <div className="ls-course-info">
-                    <div className="ls-course-title">{course.title}</div>
-                    {course.description && <div className="ls-course-desc">{course.description}</div>}
-                  </div>
-                  <span className="ls-course-arrow">→</span>
-                </Link>
+        {error && (
+          <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>
+        )}
+
+        <button
+          onClick={handleJoin}
+          disabled={!isComplete || validating}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: isComplete ? 'var(--brand-accent, #3b82f6)' : 'var(--c-surface-2, #2a2a2a)',
+            color: isComplete ? '#fff' : 'var(--c-text-muted, #6b7280)',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            fontSize: '1rem',
+            cursor: isComplete && !validating ? 'pointer' : 'not-allowed',
+            transition: 'background-color 0.2s',
+            marginTop: '8px'
+          }}
+        >
+          {validating ? 'Checking...' : 'Join course'}
+        </button>
+      </div>
+
+      {enrolledCourses.length > 0 && (
+        <div style={{ maxWidth: '480px', width: '100%', marginTop: '32px' }}>
+          <h3 style={{ color: 'var(--c-text-muted, #9ca3af)', fontSize: '1rem', marginBottom: '16px', borderBottom: '1px solid var(--c-border, #333)', paddingBottom: '8px' }}>My enrolled courses</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {enrolledCourses.map(course => (
+              <li key={course.id || course._id}>
+                <a
+                  href={`/course/${course.id || course._id}`}
+                  onClick={(e) => { e.preventDefault(); navigate(`/course/${course.id || course._id}`); }}
+                  style={{ color: 'var(--brand-accent, #3b82f6)', textDecoration: 'none', display: 'block', padding: '12px', backgroundColor: 'var(--c-surface, #1e1e1e)', borderRadius: '8px', border: '1px solid var(--c-border, #333)' }}
+                >
+                  {course.title || course.name || 'Untitled Course'}
+                </a>
               </li>
             ))}
           </ul>
-        ) : (
-          <div className="ls-empty">
-            <div className="ls-empty-icon">◎</div>
-            <div className="ls-empty-title">No courses yet</div>
-            <div className="ls-empty-sub">Join a course using the 6-character code from your educator.</div>
-          </div>
-        )}
-
-        <div className="ls-divider" />
-        
-        {showForm ? (
-          <form className="ls-form animate-slide-up" onSubmit={handleJoin}>
-            <div className="t-label t-faint" style={{ marginBottom: 10, letterSpacing: '0.07em', fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>Join Course</div>
-            <input 
-              className="input t-mono" 
-              placeholder="e.g. AB7X92" 
-              value={courseCode} 
-              onChange={(e) => { setCourseCode(e.target.value.toUpperCase()); setError(''); }} 
-              maxLength={6}
-              autoFocus 
-              required 
-            />
-            {error && <div className="ls-field-error" style={{ marginTop: 8 }}>{error}</div>}
-            <div className="ls-form-actions" style={{ marginTop: 16 }}>
-              <button type="button" className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); }}>Cancel</button>
-              <button type="submit" className="btn btn-primary" disabled={courseCode.length !== 6 || joining}>
-                {joining ? 'Joining…' : 'Join Course'}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <button className="btn btn-primary" style={{ alignSelf: 'flex-start' }} onClick={() => setShowForm(true)}>
-            Join a course
-          </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
