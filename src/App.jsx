@@ -20,6 +20,10 @@ function ProtectedRoute({ allowedRole }) {
 }
 
 export default function App() {
+  React.useEffect(() => {
+    document.title = 'Nodemap';
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter basename="/concept-dependency-map">

@@ -49,7 +49,7 @@ export default function AddConceptDialog({ open, onCancel, onSubmit, submitting 
         {/* header */}
         <div className="acd-header">
           <div>
-            <div className="t-label t-faint" style={{ marginBottom: 4 }}>New waypoint</div>
+            <div className="t-label t-faint" style={{ marginBottom: 4 }}>New concept</div>
             <h2 className="acd-title t-display">Mark a concept</h2>
           </div>
           <button className="btn btn-ghost btn-sm acd-close" onClick={onCancel} aria-label="Close">✕</button>

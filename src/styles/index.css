@@ -1,5 +1,5 @@
 /* ============================================================
-   Waypoint Design System
+   Nodemap Design System
    Minimal, professional SaaS aesthetic — Linear/Vercel inspired
    ============================================================ */
 
@@ -19,9 +19,14 @@
   --c-text-inv:    #0a0a0b;
 
   /* -- Brand / accent ------------------------------------------- */
-  --c-accent:      #7c6af7;   /* indigo-violet */
-  --c-accent-dim:  #4a3fa3;
-  --c-accent-glow: rgba(124,106,247,0.18);
+  --brand-primary: #1D4ED8;
+  --brand-accent:  #3B82F6;
+  --brand-light:   #60A5FA;
+  --brand-lightest:#BFDBFE;
+
+  --c-accent:      var(--brand-accent);
+  --c-accent-dim:  #1e40af;
+  --c-accent-glow: rgba(59,130,246,0.18);
 
   /* -- Mastery states ------------------------------------------- */
   --c-confident:   #34d399;   /* emerald */
@@ -185,13 +190,14 @@ body {
 
 /* variants */
 .btn-primary {
-  background: var(--c-accent);
+  background: var(--brand-primary);
   color: #fff;
-  border-color: var(--c-accent);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
 }
 .btn-primary:hover {
-  background: #8b7af9;
-  border-color: #8b7af9;
+  background: #1E40AF;
   box-shadow: 0 0 16px var(--c-accent-glow);
 }
 

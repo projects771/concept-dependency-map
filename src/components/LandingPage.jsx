@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './LandingScreen.css'; // Re-use existing styles
+import Logo from './Logo.jsx';
+import '../LandingScreen.css'; // Re-use existing styles
 
 export default function LandingPage() {
   return (
     <div className="ls-shell">
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="ls-logo t-mono" style={{ margin: 0 }}>◈ waypoint</div>
+        <Logo />
         <div style={{ display: 'flex', gap: 16 }}>
           <Link to="/join" className="btn btn-ghost btn-sm">Sign in</Link>
           <Link to="/join" className="btn btn-primary btn-sm">Get started</Link>
@@ -18,7 +19,7 @@ export default function LandingPage() {
           See why you're stuck, <br/>not just where.
         </h1>
         <p className="ls-sub" style={{ fontSize: '1.2rem', maxWidth: 500, margin: '0 auto 40px' }}>
-          Waypoint maps your course concepts as a dependency graph. Master the fundamentals before unlocking advanced topics.
+          Nodemap maps your course concepts as a dependency graph. Master the fundamentals before unlocking advanced topics.
         </p>
 
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>

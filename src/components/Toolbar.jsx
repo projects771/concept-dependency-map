@@ -20,7 +20,7 @@ export default function Toolbar({ role, course, onAddConcept, onBackToCourses, s
         <div className="tb-divider-v" />
         <div className="tb-course">
           <span className="t-mono tb-course-icon">◈</span>
-          <span className="tb-course-name">{course?.title ?? 'Waypoint'}</span>
+          <span className="tb-course-name">{course?.title ?? 'Nodemap'}</span>
         </div>
       </div>
 

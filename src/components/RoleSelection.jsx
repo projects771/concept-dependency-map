@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import Logo from './Logo.jsx';
 
 export default function RoleSelection() {
   const [searchParams] = useSearchParams();
@@ -9,7 +10,9 @@ export default function RoleSelection() {
     <div className="ls-shell">
       <div className="ls-card animate-slide-up">
         <Link to="/" className="ls-back-btn btn btn-ghost btn-sm" style={{ position: 'absolute', top: 20, left: 20 }}>← Home</Link>
-        <div className="ls-logo t-mono" style={{ marginTop: 20 }}>◈ waypoint</div>
+        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
+          <Logo />
+        </div>
         <h1 className="ls-headline t-display">Welcome.</h1>
         <p className="ls-sub">How are you joining today?</p>
 

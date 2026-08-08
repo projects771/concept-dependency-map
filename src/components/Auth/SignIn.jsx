@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Logo from '../Logo.jsx';
 
 export default function SignIn() {
   const [searchParams] = useSearchParams();
@@ -37,7 +38,9 @@ export default function SignIn() {
     <div className="ls-shell">
       <div className="ls-card animate-slide-up">
         <Link to="/join" className="ls-back-btn btn btn-ghost btn-sm" style={{ position: 'absolute', top: 20, left: 20 }}>← Back</Link>
-        <div className="ls-logo t-mono" style={{ marginTop: 20 }}>◈ waypoint</div>
+        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
+          <Logo />
+        </div>
         <h1 className="ls-headline t-display">Sign in</h1>
         <p className="ls-sub">Continue as {role === 'educator' ? 'Educator' : 'Student'}</p>
 

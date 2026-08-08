@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import Logo from './Logo.jsx';
 
 export default function EducatorDashboard() {
   const { user, logout } = useAuth();
@@ -54,8 +55,8 @@ export default function EducatorDashboard() {
       <div className="ls-card animate-slide-up" style={{ minWidth: 600 }}>
         <div className="ls-course-header">
           <div>
-            <div className="ls-logo t-mono">◈ waypoint</div>
-            <h1 className="ls-headline t-display">Educator Dashboard</h1>
+            <Logo />
+            <h1 className="ls-headline t-display" style={{ marginTop: 12 }}>Educator Dashboard</h1>
             <p className="ls-sub">
               Signed in as {user?.name} 
               <span className="ls-role-pill ls-role-pill--educator" style={{ marginLeft: 8 }}>◈ Educator</span>
