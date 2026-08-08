@@ -5,28 +5,28 @@
 
 :root {
   /* -- Neutrals ------------------------------------------------- */
-  --c-bg:          #0a0a0b;
-  --c-surface:     #111113;
-  --c-surface-2:   #18181c;
-  --c-surface-3:   #1e1e23;
-  --c-border:      rgba(255,255,255,0.07);
-  --c-border-2:    rgba(255,255,255,0.12);
+  --c-bg:          #1c1917;
+  --c-surface:     #292524;
+  --c-surface-2:   #44403c;
+  --c-surface-3:   #57534e;
+  --c-border:      rgba(255,255,255,0.1);
+  --c-border-2:    rgba(255,255,255,0.15);
 
   /* -- Text ----------------------------------------------------- */
-  --c-text:        #e8e8ea;
-  --c-text-2:      #9494a0;
-  --c-text-3:      #5a5a68;
-  --c-text-inv:    #0a0a0b;
+  --c-text:        #fafaf9;
+  --c-text-2:      #a8a29e;
+  --c-text-3:      #78716c;
+  --c-text-inv:    #1c1917;
 
   /* -- Brand / accent ------------------------------------------- */
-  --brand-primary: #1D4ED8;
-  --brand-accent:  #3B82F6;
-  --brand-light:   #60A5FA;
-  --brand-lightest:#BFDBFE;
+  --brand-primary: #d56b4a;
+  --brand-accent:  #d56b4a;
+  --brand-light:   #e2957b;
+  --brand-lightest:#f3d2c7;
 
   --c-accent:      var(--brand-accent);
-  --c-accent-dim:  #1e40af;
-  --c-accent-glow: rgba(59,130,246,0.18);
+  --c-accent-dim:  #a64a30;
+  --c-accent-glow: rgba(213, 107, 74, 0.18);
 
   /* -- Mastery states ------------------------------------------- */
   --c-confident:   #34d399;   /* emerald */
