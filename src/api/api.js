@@ -8,10 +8,15 @@ async function request(path, options = {}) {
   const timer = setTimeout(() => controller.abort(), 12_000);
   let res;
   try {
+    const token = localStorage.getItem('waypoint_token');
     res = await fetch(`${BASE}${path}`, {
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
       ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+      signal: controller.signal,
     });
   } catch (e) {
     clearTimeout(timer);
@@ -71,3 +76,15 @@ export const updateConceptResources = (id, resources) =>
 
 export const fetchAnalytics = (courseId) =>
   request(`/api/analytics/${encodeURIComponent(courseId)}`);
+
+export const register = (data) =>
+  request('/api/auth/register', { method: 'POST', body: JSON.stringify(data) });
+
+export const login = (data) =>
+  request('/api/auth/login', { method: 'POST', body: JSON.stringify(data) });
+
+export const getMe = () =>
+  request('/api/auth/me');
+
+export const joinCourse = (courseCode) =>
+  request('/api/courses/join', { method: 'POST', body: JSON.stringify({ courseCode }) });
