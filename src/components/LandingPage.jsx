@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo.jsx';
-import '../LandingScreen.css'; // Re-use existing styles
+import './LandingScreen.css'; // Re-use existing styles
 
 export default function LandingPage() {
   return (
