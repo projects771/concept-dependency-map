@@ -59,13 +59,29 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loginWithGoogle = async (accessToken, role) => {
+    try {
+      const res = await api.googleAuth(accessToken, role);
+      if (res.token) {
+        localStorage.setItem('waypoint_token', res.token);
+        setUser(res.user);
+        return res.user;
+      } else {
+        throw new Error(res.error || 'Google login failed');
+      }
+    } catch (err) {
+      toast.error(err.message);
+      throw err;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('waypoint_token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, register, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -9,6 +9,8 @@ import EducatorDashboard from './components/EducatorDashboard.jsx';
 import CourseJoin from './components/CourseJoin.jsx';
 import CourseMap from './components/CourseMap.jsx';
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 function ProtectedRoute({ allowedRole }) {
   const { user, loading } = useAuth();
   if (loading) return null; // Wait for initial auth check
@@ -25,25 +27,27 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <BrowserRouter basename="/concept-dependency-map">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/join" element={<RoleSelection />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/register" element={<Register />} />
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <BrowserRouter basename="/concept-dependency-map">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/join" element={<RoleSelection />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route element={<ProtectedRoute allowedRole="educator" />}>
-            <Route path="/dashboard" element={<EducatorDashboard />} />
-            <Route path="/course/:id/edit" element={<div className="app-shell"><CourseMap /></div>} />
-          </Route>
+            <Route element={<ProtectedRoute allowedRole="educator" />}>
+              <Route path="/dashboard" element={<EducatorDashboard />} />
+              <Route path="/course/:id/edit" element={<div className="app-shell"><CourseMap /></div>} />
+            </Route>
 
-          <Route element={<ProtectedRoute allowedRole="student" />}>
-            <Route path="/student/join" element={<CourseJoin />} />
-            <Route path="/course/:id" element={<div className="app-shell"><CourseMap /></div>} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route element={<ProtectedRoute allowedRole="student" />}>
+              <Route path="/student/join" element={<CourseJoin />} />
+              <Route path="/course/:id" element={<div className="app-shell"><CourseMap /></div>} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }

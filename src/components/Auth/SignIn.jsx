@@ -1,17 +1,31 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function SignIn() {
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') || 'student';
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const user = await loginWithGoogle(tokenResponse.access_token, role);
+        if (user.role === 'educator') navigate('/dashboard');
+        else navigate('/student/join');
+      } catch (err) {
+        setError(err.message);
+      }
+    },
+    onError: () => setError('Google sign-in failed. Please try again.'),
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,10 +41,6 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    alert('Google Sign-In is not implemented yet.');
   };
 
   return (
@@ -54,7 +64,7 @@ export default function SignIn() {
 
         <button 
           type="button"
-          onClick={handleGoogleSignIn}
+          onClick={() => googleLogin()}
           style={{ 
             width: '100%', 
             padding: '12px 16px', 

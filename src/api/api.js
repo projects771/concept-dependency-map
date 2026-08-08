@@ -86,5 +86,8 @@ export const login = (data) =>
 export const getMe = () =>
   request('/api/auth/me');
 
+export const googleAuth = (accessToken, role) =>
+  request('/api/auth/google', { method: 'POST', body: JSON.stringify({ accessToken, role }) });
+
 export const joinCourse = (courseCode) =>
   request('/api/courses/join', { method: 'POST', body: JSON.stringify({ courseCode }) });

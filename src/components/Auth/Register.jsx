@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Register() {
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') || 'student';
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -13,6 +14,19 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const user = await loginWithGoogle(tokenResponse.access_token, role);
+        if (user.role === 'educator') navigate('/dashboard');
+        else navigate('/student/join');
+      } catch (err) {
+        setError(err.message);
+      }
+    },
+    onError: () => setError('Google sign-in failed. Please try again.'),
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,10 +42,6 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogle = () => {
-    alert('Google Sign-Up is not implemented yet.');
   };
 
   const inputStyle = {
@@ -75,7 +85,7 @@ export default function Register() {
 
         <button
           type="button"
-          onClick={handleGoogle}
+          onClick={() => googleLogin()}
           style={{
             width: '100%',
             padding: '12px 16px',
