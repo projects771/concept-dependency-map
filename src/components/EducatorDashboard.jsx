@@ -91,7 +91,7 @@ export default function EducatorDashboard() {
                     <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', marginLeft: 8, height: 'auto', fontSize: 12 }} onClick={() => copyCode(course.courseCode)}>Copy</button>
                   </div>
                   <div style={{ fontSize: 13, color: 'var(--c-faint)' }}>
-                    • {Math.floor(Math.random() * 20) + 1} students enrolled
+                    • {course.studentCount || 0} student{(course.studentCount !== 1) ? 's' : ''} enrolled
                   </div>
                 </div>
               </li>

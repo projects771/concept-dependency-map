@@ -106,9 +106,11 @@ function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
   const [newUrl, setNewUrl] = React.useState('');
 
   const handleAddResource = () => {
-    if (!newTitle || !newUrl) return;
+    const titleToUse = newTitle.trim() || newUrl.trim();
+    if (!titleToUse && !newUrl.trim()) return;
+    
     const current = Array.isArray(node.data.resources) ? node.data.resources : [];
-    onUpdateResources(node.id, [...current, { title: newTitle, url: newUrl }]);
+    onUpdateResources(node.id, [...current, { title: titleToUse, url: newUrl.trim() }]);
     setNewTitle('');
     setNewUrl('');
   };
