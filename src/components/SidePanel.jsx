@@ -27,19 +27,23 @@ function getHostname(url) {
 }
 
 function ResourceLink({ resource, index }) {
-  if (isUrl(resource)) {
+  const isObj = typeof resource === 'object' && resource !== null;
+  const url = isObj ? resource.url : (isUrl(resource) ? resource : null);
+  const title = isObj ? resource.title : (url ? getHostname(url) : resource);
+
+  if (url) {
     return (
       <li className="sp-resource-item sp-resource-item--link">
         <span className="sp-resource-link-icon" aria-hidden="true">↗</span>
         <a
-          href={resource}
+          href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="sp-resource-link"
-          title={resource}
+          title={url}
         >
-          <span className="sp-resource-link-name">{getHostname(resource)}</span>
-          <span className="sp-resource-link-host t-faint">{resource.length > 60 ? resource.slice(0, 60) + '…' : resource}</span>
+          <span className="sp-resource-link-name">{title}</span>
+          <span className="sp-resource-link-host t-faint">{url.length > 60 ? url.slice(0, 60) + '…' : url}</span>
         </a>
       </li>
     );
@@ -47,7 +51,7 @@ function ResourceLink({ resource, index }) {
   return (
     <li className="sp-resource-item">
       <span className="sp-resource-dot" aria-hidden="true" />
-      <span>{resource}</span>
+      <span>{title}</span>
     </li>
   );
 }
@@ -97,7 +101,17 @@ function ResourcesList({ resources }) {
 }
 
 /* ── Educator panel ── */
-function EducatorPanel({ node, onClose, onDelete }) {
+function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
+  const [newTitle, setNewTitle] = React.useState('');
+  const [newUrl, setNewUrl] = React.useState('');
+
+  const handleAddResource = () => {
+    if (!newTitle || !newUrl) return;
+    const current = Array.isArray(node.data.resources) ? node.data.resources : [];
+    onUpdateResources(node.id, [...current, { title: newTitle, url: newUrl }]);
+    setNewTitle('');
+    setNewUrl('');
+  };
   return (
     <>
       <PanelHeader node={node} onClose={onClose} />
@@ -111,6 +125,22 @@ function EducatorPanel({ node, onClose, onDelete }) {
         )}
 
         <ResourcesList resources={node.data.resources} />
+
+        <div className="add-resource">
+          <input
+            className="sp-input"
+            placeholder="Resource title"
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+          />
+          <input
+            className="sp-input"
+            placeholder="URL"
+            value={newUrl}
+            onChange={e => setNewUrl(e.target.value)}
+          />
+          <button className="btn btn-sm" onClick={handleAddResource}>Add resource</button>
+        </div>
 
         <section className="sp-section">
           <div className="sp-section-label t-label t-faint">Concept ID</div>
@@ -172,7 +202,7 @@ function StudentPanel({ node, onClose, onMasteryChange }) {
 }
 
 /* ── Main ── */
-export default function SidePanel({ node, role, onClose, onMasteryChange, onDelete }) {
+export default function SidePanel({ node, role, onClose, onMasteryChange, onDelete, onUpdateResources }) {
   const isOpen     = Boolean(node);
   const isEducator = role === 'educator';
 
@@ -182,7 +212,7 @@ export default function SidePanel({ node, role, onClose, onMasteryChange, onDele
       <aside className={`sp ${isOpen ? 'sp--open' : ''}`} aria-hidden={!isOpen} role="complementary" aria-label="Concept details">
         {node && (
           isEducator
-            ? <EducatorPanel node={node} onClose={onClose} onDelete={onDelete} />
+            ? <EducatorPanel node={node} onClose={onClose} onDelete={onDelete} onUpdateResources={onUpdateResources} />
             : <StudentPanel  node={node} onClose={onClose} onMasteryChange={onMasteryChange} />
         )}
       </aside>

@@ -35,7 +35,7 @@ function ConceptNode({ data, selected }) {
         'cn',
         isEducator ? 'cn--educator' : `cn--${mastery}`,
         selected ? 'cn--selected' : '',
-        isRisk    ? `cn--risk cn--risk-${riskKey}` : '',
+        isRisk    ? `cn--risk-${riskKey}` : '',
       ].filter(Boolean).join(' ')}
       style={{ '--mastery-dot': cfg.dot, '--mastery-dim': cfg.dim }}
     >

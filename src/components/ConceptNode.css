@@ -33,13 +33,17 @@
 .cn--struggling { --mastery-dot: var(--c-struggling); }
 
 /* gap risk */
-.cn--risk {
+.cn--risk-high {
   border-color: var(--c-struggling);
-  box-shadow: 0 0 0 1px rgba(248,113,113,0.4), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(248,113,113,0.5), var(--shadow-sm);
 }
 .cn--risk-medium {
   border-color: var(--c-learning);
-  box-shadow: 0 0 0 1px rgba(251,191,36,0.4), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(251,191,36,0.5), var(--shadow-sm);
+}
+.cn--risk-unknown {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249,115,22,0.3), var(--shadow-sm);
 }
 
 /* risk badge */
@@ -62,6 +66,11 @@
 .cn--risk-medium .cn-risk-badge {
   background: var(--c-learning);
   color: #000;
+}
+
+.cn--risk-unknown .cn-risk-badge {
+  background: #f97316;
+  color: #fff;
 }
 
 @keyframes badge-pulse {

@@ -8,6 +8,7 @@ import GraphCanvas from './components/GraphCanvas.jsx';
 import SidePanel from './components/SidePanel.jsx';
 import Toolbar from './components/Toolbar.jsx';
 import AddConceptDialog from './components/AddConceptDialog.jsx';
+import AnalyticsPanel from './components/AnalyticsPanel.jsx';
 
 export default function App() {
   const toast          = useToast();
@@ -60,7 +61,7 @@ export default function App() {
   const handleAddCancel    = useCallback(() => setAddDialog({ open: false, position: { x: 0, y: 0 } }), []);
   const handleNodeClick    = useCallback((_e, node) => setSelectedNodeId(node.id), []);
   const handleClosePanel   = useCallback(() => setSelectedNodeId(null), []);
-  const handleNodeDragStop = useCallback((_e, node) => graph.persistNodePosition(node.id, node.position), [graph]);
+  const handleNodeDragStop = useCallback((_e, node) => graph.persistNodePosition(node.id, node.position, node.data), [graph]);
   const handleConnect      = useCallback((conn) => graph.addEdgeBetween(conn.source, conn.target), [graph]);
   const handleEdgesDelete  = useCallback((del) => graph.removeEdges(del), [graph]);
 
@@ -123,7 +124,10 @@ export default function App() {
             onClose={handleClosePanel}
             onMasteryChange={!isEducator ? handleMasteryChange : undefined}
             onDelete={isEducator ? handleDeleteConcept : undefined}
+            onUpdateResources={isEducator ? graph.updateResources : undefined}
           />
+
+          {isEducator && <AnalyticsPanel courseId={courseId} />}
 
           {isEducator && (
             <AddConceptDialog

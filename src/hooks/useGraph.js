@@ -5,6 +5,12 @@ import * as api from '../api/api.js';
 const NODE_TYPE = 'concept';
 
 function toFlowNode(concept, masteryMap = {}) {
+  let resources = [];
+  if (typeof concept.resources === 'string') {
+    try { resources = JSON.parse(concept.resources); } catch (e) {}
+  } else if (Array.isArray(concept.resources)) {
+    resources = concept.resources;
+  }
   return {
     id: concept.id,
     type: NODE_TYPE,
@@ -12,7 +18,7 @@ function toFlowNode(concept, masteryMap = {}) {
     data: {
       title:       concept.title,
       description: concept.description || '',
-      resources:   concept.resources   || [],
+      resources,
       mastery:     masteryMap[concept.id] ?? concept.mastery ?? 'learning',
       gapRisk:     false,
       gapMeta:     null,
@@ -75,8 +81,15 @@ export function useGraph(courseId, toast) {
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
 
-  // position not in API contract — no-op but keeps interface stable
-  const persistNodePosition = useCallback(() => {}, []);
+  const persistNodePosition = useCallback((id, position, data) => {
+    withPending(async () => {
+      try {
+        await api.updateConceptPosition(id, Math.round(position.x), Math.round(position.y), data?.title, data?.description || '');
+      } catch (e) {
+        toast?.error(`Could not save position: ${e.message}`);
+      }
+    });
+  }, [withPending, toast]);
 
   const addConcept = useCallback(async (formData, position) => {
     return withPending(async () => {
@@ -169,6 +182,19 @@ export function useGraph(courseId, toast) {
     }
   }, [withPending, toast]);
 
+  const updateResources = useCallback((id, resources) => {
+    setNodes((nds) =>
+      nds.map((n) => n.id === id ? { ...n, data: { ...n.data, resources } } : n));
+    withPending(async () => {
+      try {
+        await api.updateConceptResources(id, resources);
+        toast?.success('Resources updated');
+      } catch (e) {
+        toast?.error(`Could not update resources: ${e.message}`);
+      }
+    });
+  }, [withPending, toast]);
+
   return {
     nodes, edges, loading,
     saving: pendingCount > 0,
@@ -177,6 +203,6 @@ export function useGraph(courseId, toast) {
     persistNodePosition,
     addConcept, removeConcept,
     addEdgeBetween, removeEdges,
-    setMastery,
+    setMastery, updateResources,
   };
 }

@@ -62,3 +62,12 @@ export const fetchMastery  = (studentId = STUDENT_ID) =>
 
 export const fetchGaps     = (conceptId, studentId = STUDENT_ID) =>
   request(`/api/gaps/${encodeURIComponent(conceptId)}?studentId=${encodeURIComponent(studentId)}`);
+
+export const updateConceptPosition = (id, x, y, title, description) =>
+  request(`/api/concepts/${id}`, { method: 'PATCH', body: JSON.stringify({ x, y, title, description }) });
+
+export const updateConceptResources = (id, resources) =>
+  request(`/api/concepts/${id}/resources`, { method: 'PATCH', body: JSON.stringify({ resources }) });
+
+export const fetchAnalytics = (courseId) =>
+  request(`/api/analytics/${encodeURIComponent(courseId)}`);
