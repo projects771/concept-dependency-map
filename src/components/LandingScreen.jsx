@@ -42,11 +42,7 @@ export default function LandingScreen({ onEnter }) {
 
   function handleRolePick(r) {
     setRole(r);
-    if (r === 'educator') {
-      setStep('verify-eid');
-    } else {
-      setStep('courses');
-    }
+    setStep('courses');
   }
 
   function handleEidSubmit(e) {
@@ -117,49 +113,6 @@ export default function LandingScreen({ onEnter }) {
     );
   }
 
-  /* ── Step 2: Educator EID verification ── */
-  if (step === 'verify-eid') {
-    return (
-      <div className="ls-shell">
-        <div className="ls-card animate-slide-up">
-          <div className="ls-logo t-mono">◈ waypoint</div>
-          <button className="ls-back-btn btn btn-ghost btn-sm" onClick={handleBack}>← Back</button>
-
-          <h1 className="ls-headline t-display">Educator access</h1>
-          <p className="ls-sub">Enter your Educator ID to continue.</p>
-
-          <form className="ls-eid-form" onSubmit={handleEidSubmit}>
-            <div className="ls-field">
-              <label className="ls-field-label t-label t-faint" htmlFor="eid-input">
-                Educator ID (EID)
-              </label>
-              <input
-                ref={eidRef}
-                id="eid-input"
-                className={`input ls-eid-input ${eidError ? 'input--error' : ''}`}
-                placeholder="e.g. EID-2024"
-                value={eid}
-                onChange={(e) => { setEid(e.target.value); setEidError(''); }}
-                autoComplete="off"
-                spellCheck={false}
-              />
-              {eidError && (
-                <div className="ls-field-error animate-slide-down">{eidError}</div>
-              )}
-            </div>
-
-            <button type="submit" className="btn btn-primary ls-eid-submit" disabled={!eid.trim()}>
-              Verify &amp; continue →
-            </button>
-          </form>
-
-          <div className="ls-eid-hint t-faint">
-            Demo EID: <code className="t-mono">EID-2024</code>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   /* ── Step 3: Course list ── */
   const roleLabel = role === 'educator' ? 'Educator' : 'Student';
