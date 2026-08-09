@@ -26,13 +26,14 @@
   font-size: 14px;
   line-height: 1;
   padding-bottom: 2px;
-  opacity: 0;
-  transition: opacity 0.2s;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.react-flow__edge:hover .deletable-edge-button {
+.deletable-edge-button:hover {
   opacity: 1;
+  transform: scale(1.1);
 }
 
 /* student mode handles hidden */
