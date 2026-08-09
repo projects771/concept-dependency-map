@@ -78,7 +78,7 @@ export default function CourseMap() {
     <>
       <Toolbar
         role={role}
-        course={{ title: 'Course Map' }}
+        course={graph.course}
         onAddConcept={isEducator ? handleAddConceptFromToolbar : undefined}
         onBackToCourses={handleBackToCourses}
         saving={graph.saving}

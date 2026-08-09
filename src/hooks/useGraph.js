@@ -65,6 +65,7 @@ function toFlowEdge(edge) {
 }
 
 export function useGraph(courseId, toast) {
+  const [course,       setCourse]       = useState(null);
   const [nodes,        setNodes]        = useState([]);
   const [edges,        setEdges]        = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -90,7 +91,7 @@ export function useGraph(courseId, toast) {
         if (!alive) return;
         if (conceptsRes.status === 'rejected') throw conceptsRes.reason;
 
-        const { concepts = [], edges = [] } = conceptsRes.value;
+        const { course: loadedCourse = null, concepts = [], edges = [] } = conceptsRes.value;
         const masteryMap = {};
         if (masteryRes.status === 'fulfilled') {
           (masteryRes.value?.mastery ?? []).forEach(({ conceptId, status }) => {
@@ -106,6 +107,7 @@ export function useGraph(courseId, toast) {
           loadedNodes = layouted.nodes;
         }
 
+        setCourse(loadedCourse);
         setNodes(loadedNodes);
         setEdges(loadedEdges);
       } catch (e) {
@@ -251,6 +253,7 @@ export function useGraph(courseId, toast) {
   }, [withPending, toast]);
 
   return {
+    course,
     nodes, edges, loading,
     saving: pendingCount > 0,
     setNodes, setEdges,
