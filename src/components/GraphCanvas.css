@@ -6,22 +6,38 @@
 
 .react-flow { background: transparent; }
 
-/* ── trail edges ── */
-.trail-path {
-  stroke: rgba(255,255,255,0.12);
-  stroke-width: 1.5;
-  stroke-dasharray: 5 4;
-  animation: trail-march 28s linear infinite;
+/* ── custom edges ── */
+.deletable-edge-path {
+  stroke-width: 1.5px;
+  stroke: rgba(108,99,255,0.6);
 }
 
-.trail-path.is-selected {
-  stroke: var(--c-accent);
-  stroke-width: 2;
-  stroke-dasharray: none;
+.deletable-edge-button {
+  width: 20px;
+  height: 20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  padding-bottom: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-@keyframes trail-march {
-  to { stroke-dashoffset: -360; }
+.react-flow__edge:hover .deletable-edge-button {
+  opacity: 1;
+}
+
+/* student mode handles hidden */
+.student-mode .react-flow__handle {
+  display: none !important;
 }
 
 /* ── controls ── */

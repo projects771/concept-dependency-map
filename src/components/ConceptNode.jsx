@@ -39,7 +39,7 @@ function ConceptNode({ data, selected }) {
       ].filter(Boolean).join(' ')}
       style={{ '--mastery-dot': cfg.dot, '--mastery-dim': cfg.dim }}
     >
-      <Handle type="target" position={Position.Left}  className="cn-handle cn-handle--target" />
+      <Handle type="target" position={Position.Top}  className="cn-handle cn-handle--target" />
 
       {badgeText && (
         <div className="cn-risk-badge t-mono">{badgeText}</div>
@@ -56,7 +56,7 @@ function ConceptNode({ data, selected }) {
         )}
       </div>
 
-      <Handle type="source" position={Position.Right} className="cn-handle cn-handle--source" />
+      <Handle type="source" position={Position.Bottom} className="cn-handle cn-handle--source" />
     </div>
   );
 }

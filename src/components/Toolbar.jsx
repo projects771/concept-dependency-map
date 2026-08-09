@@ -6,7 +6,7 @@ const ROLE_CONFIG = {
   student:  { icon: '◎', label: 'Student',  color: 'var(--c-confident)' },
 };
 
-export default function Toolbar({ role, course, onAddConcept, onBackToCourses, saving }) {
+export default function Toolbar({ role, course, onAddConcept, onBackToCourses, saving, onRelayout }) {
   const isEducator = role === 'educator';
   const roleConf   = ROLE_CONFIG[role] ?? ROLE_CONFIG.student;
 
@@ -34,6 +34,9 @@ export default function Toolbar({ role, course, onAddConcept, onBackToCourses, s
       <div className="tb-right">
         {isEducator ? (
           <>
+            <button className="btn btn-secondary btn-sm" onClick={onRelayout} title="Auto-layout concepts top-to-bottom">
+              <span style={{ fontSize: 14 }}>▦</span> Auto-layout
+            </button>
             <button className="btn btn-primary btn-sm" onClick={onAddConcept}>
               + Add concept
             </button>

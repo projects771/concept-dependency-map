@@ -3,12 +3,14 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  min-width: 170px;
-  padding: 10px 14px 10px 12px;
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
+  width: auto;
+  max-width: 160px;
+  height: 44px;
+  padding: 10px 16px;
+  background: #1e2130;
+  border: 1.5px solid rgba(255,255,255,0.12);
   border-left: 3px solid var(--mastery-dot);
-  border-radius: var(--r-md);
+  border-radius: 10px;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: transform var(--t-fast) var(--ease),
@@ -34,16 +36,16 @@
 
 /* gap risk */
 .cn--risk-high {
-  border-color: var(--c-struggling);
-  box-shadow: 0 0 0 2px rgba(248,113,113,0.5), var(--shadow-sm);
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 8px rgba(239,68,68,0.4) !important;
 }
 .cn--risk-medium {
-  border-color: var(--c-learning);
-  box-shadow: 0 0 0 2px rgba(251,191,36,0.5), var(--shadow-sm);
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 8px rgba(245,158,11,0.3) !important;
 }
 .cn--risk-unknown {
-  border-color: #f97316;
-  box-shadow: 0 0 0 2px rgba(249,115,22,0.3), var(--shadow-sm);
+  border-color: #f97316 !important;
+  box-shadow: 0 0 8px rgba(249,115,22,0.3) !important;
 }
 
 /* risk badge */
@@ -96,13 +98,14 @@
 }
 
 .cn-title {
-  font-size: 14px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--c-text);
+  color: #e8e9f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
+  max-width: 140px;
 }
 
 .cn-status {
@@ -116,18 +119,18 @@
 .cn-handle {
   width: 8px !important;
   height: 8px !important;
-  background: var(--c-surface-3) !important;
-  border: 1.5px solid var(--c-border-2) !important;
-  transition: background var(--t-fast);
+  background: #6c63ff !important;
+  border: none !important;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
-.cn-handle:hover {
-  background: var(--c-accent) !important;
-  border-color: var(--c-accent) !important;
+.cn--educator:hover .cn-handle {
+  opacity: 1;
 }
 
-.cn-handle--target { left: -5px !important; }
-.cn-handle--source { right: -5px !important; }
+.cn-handle--target { top: -4px !important; }
+.cn-handle--source { bottom: -4px !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .cn-risk-badge { animation: none; }

@@ -1,8 +1,40 @@
 import { useCallback, useEffect, useState } from 'react';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
+import dagre from '@dagrejs/dagre';
 import * as api from '../api/api.js';
 
 const NODE_TYPE = 'concept';
+
+const getLayoutedElements = (nodes, edges) => {
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: 'TB', ranksep: 100, nodesep: 80 });
+
+  nodes.forEach(node => g.setNode(node.id, { width: 160, height: 44 }));
+  edges.forEach(edge => g.setEdge(edge.source, edge.target));
+
+  dagre.layout(g);
+
+  return {
+    nodes: nodes.map(node => {
+      const { x, y } = g.node(node.id);
+      return { ...node, position: { x: x - 80, y: y - 22 } };
+    }),
+    edges,
+  };
+};
+
+function needsLayout(nodes) {
+  if (nodes.length === 0) return false;
+  if (nodes.every(n => n.position.x === 0 && n.position.y === 0)) return true;
+  const posSet = new Set();
+  for (const n of nodes) {
+    const key = `${n.position.x},${n.position.y}`;
+    if (posSet.has(key)) return true;
+    posSet.add(key);
+  }
+  return false;
+}
 
 function toFlowNode(concept, masteryMap = {}) {
   let resources = [];
@@ -29,7 +61,7 @@ function toFlowNode(concept, masteryMap = {}) {
 function toFlowEdge(edge) {
   const source = edge.from   ?? edge.source;
   const target = edge.to     ?? edge.target;
-  return { id: edge.id ?? `e${source}-${target}`, source, target, type: 'trail' };
+  return { id: edge.id ?? `e${source}-${target}`, source, target };
 }
 
 export function useGraph(courseId, toast) {
@@ -65,8 +97,17 @@ export function useGraph(courseId, toast) {
             masteryMap[conceptId] = status;
           });
         }
-        setNodes(concepts.map((c) => toFlowNode(c, masteryMap)));
-        setEdges(edges.map(toFlowEdge));
+        
+        let loadedNodes = concepts.map((c) => toFlowNode(c, masteryMap));
+        const loadedEdges = edges.map(toFlowEdge);
+        
+        if (needsLayout(loadedNodes)) {
+          const layouted = getLayoutedElements(loadedNodes, loadedEdges);
+          loadedNodes = layouted.nodes;
+        }
+
+        setNodes(loadedNodes);
+        setEdges(loadedEdges);
       } catch (e) {
         if (alive) toast?.error(`Failed to load course: ${e.message}`);
       } finally {
@@ -80,6 +121,12 @@ export function useGraph(courseId, toast) {
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
+
+  const relayout = useCallback(() => {
+    const { nodes: layoutedNodes } = getLayoutedElements(nodes, edges);
+    setNodes(layoutedNodes);
+    toast?.success('Auto-layout applied (drag nodes to save position)');
+  }, [nodes, edges, toast]);
 
   const persistNodePosition = useCallback((id, position, data) => {
     withPending(async () => {
@@ -132,7 +179,7 @@ export function useGraph(courseId, toast) {
         const created = await api.createEdge(source, target, courseId);
         setEdges((eds) => eds.concat({
           id: `e${created.from}-${created.to}`,
-          source: created.from, target: created.to, type: 'trail',
+          source: created.from, target: created.to,
         }));
         toast?.success('Dependency added');
       } catch (e) {
@@ -144,8 +191,16 @@ export function useGraph(courseId, toast) {
   const removeEdges = useCallback((edgesToRemove) => {
     const ids = new Set(edgesToRemove.map((e) => e.id));
     setEdges((eds) => eds.filter((e) => !ids.has(e.id)));
-    toast?.info('Edge removed (local only — backend endpoint pending)');
-  }, [toast]);
+    
+    withPending(async () => {
+      try {
+        await Promise.all(edgesToRemove.map(e => api.deleteEdge(e.source, e.target)));
+        toast?.success('Dependency removed');
+      } catch (e) {
+        toast?.error(`Could not delete dependency: ${e.message}`);
+      }
+    });
+  }, [withPending, toast]);
 
   const setMastery = useCallback((id, status) => {
     setNodes((nds) =>
@@ -204,5 +259,6 @@ export function useGraph(courseId, toast) {
     addConcept, removeConcept,
     addEdgeBetween, removeEdges,
     setMastery, updateResources,
+    relayout,
   };
 }

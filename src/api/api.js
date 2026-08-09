@@ -59,6 +59,9 @@ export const deleteConcept = (id)      => request(`/api/concepts/${id}`, { metho
 export const createEdge    = (fromId, toId, courseId) =>
   request('/api/concepts/edge', { method: 'POST', body: JSON.stringify({ fromId, toId, courseId }) });
 
+export const deleteEdge    = (fromId, toId) =>
+  request('/api/concepts/edge', { method: 'DELETE', body: JSON.stringify({ fromId, toId }) });
+
 export const updateMastery = (conceptId, status, studentId = STUDENT_ID) =>
   request(`/api/mastery/${conceptId}`, { method: 'PATCH', body: JSON.stringify({ studentId, status }) });
 

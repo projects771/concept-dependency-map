@@ -100,8 +100,36 @@ function ResourcesList({ resources }) {
   );
 }
 
+function DependenciesList({ node, nodes, edges }) {
+  if (!nodes || !edges) return null;
+  const requiresIds = edges.filter(e => e.target === node.id).map(e => e.source);
+  const unlocksIds = edges.filter(e => e.source === node.id).map(e => e.target);
+
+  const requires = requiresIds.map(id => nodes.find(n => n.id === id)?.data.title).filter(Boolean);
+  const unlocks = unlocksIds.map(id => nodes.find(n => n.id === id)?.data.title).filter(Boolean);
+
+  if (requires.length === 0 && unlocks.length === 0) return null;
+
+  return (
+    <section className="sp-section" style={{ marginTop: 24, marginBottom: 24 }}>
+      {requires.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <div className="sp-section-label t-label t-faint">Requires</div>
+          <div style={{ fontSize: 13, color: 'var(--c-text-2)' }}>{requires.join(', ')}</div>
+        </div>
+      )}
+      {unlocks.length > 0 && (
+        <div>
+          <div className="sp-section-label t-label t-faint">Unlocks</div>
+          <div style={{ fontSize: 13, color: 'var(--c-text-2)' }}>{unlocks.join(', ')}</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* ── Educator panel ── */
-function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
+function EducatorPanel({ node, nodes, edges, onClose, onDelete, onUpdateResources }) {
   const [newTitle, setNewTitle] = React.useState('');
   const [newUrl, setNewUrl] = React.useState('');
 
@@ -125,6 +153,8 @@ function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
         ) : (
           <p className="sp-desc sp-desc--empty">No description added yet.</p>
         )}
+
+        <DependenciesList node={node} nodes={nodes} edges={edges} />
 
         <ResourcesList resources={node.data.resources} />
 
@@ -161,7 +191,7 @@ function EducatorPanel({ node, onClose, onDelete, onUpdateResources }) {
 }
 
 /* ── Student panel ── */
-function StudentPanel({ node, onClose, onMasteryChange }) {
+function StudentPanel({ node, nodes, edges, onClose, onMasteryChange }) {
   const current = node.data.mastery || 'learning';
 
   return (
@@ -173,6 +203,8 @@ function StudentPanel({ node, onClose, onMasteryChange }) {
         <GapNotice gapRisk={node.data.gapRisk} gapMeta={node.data.gapMeta} />
 
         {node.data.description && <p className="sp-desc">{node.data.description}</p>}
+
+        <DependenciesList node={node} nodes={nodes} edges={edges} />
 
         {/* mastery — students only */}
         <section className="sp-section">
@@ -204,7 +236,7 @@ function StudentPanel({ node, onClose, onMasteryChange }) {
 }
 
 /* ── Main ── */
-export default function SidePanel({ node, role, onClose, onMasteryChange, onDelete, onUpdateResources }) {
+export default function SidePanel({ node, nodes, edges, role, onClose, onMasteryChange, onDelete, onUpdateResources }) {
   const isOpen     = Boolean(node);
   const isEducator = role === 'educator';
 
@@ -214,8 +246,8 @@ export default function SidePanel({ node, role, onClose, onMasteryChange, onDele
       <aside className={`sp ${isOpen ? 'sp--open' : ''}`} aria-hidden={!isOpen} role="complementary" aria-label="Concept details">
         {node && (
           isEducator
-            ? <EducatorPanel node={node} onClose={onClose} onDelete={onDelete} onUpdateResources={onUpdateResources} />
-            : <StudentPanel  node={node} onClose={onClose} onMasteryChange={onMasteryChange} />
+            ? <EducatorPanel node={node} nodes={nodes} edges={edges} onClose={onClose} onDelete={onDelete} onUpdateResources={onUpdateResources} />
+            : <StudentPanel  node={node} nodes={nodes} edges={edges} onClose={onClose} onMasteryChange={onMasteryChange} />
         )}
       </aside>
     </>

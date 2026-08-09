@@ -82,6 +82,7 @@ export default function CourseMap() {
         onAddConcept={isEducator ? handleAddConceptFromToolbar : undefined}
         onBackToCourses={handleBackToCourses}
         saving={graph.saving}
+        onRelayout={isEducator ? graph.relayout : undefined}
       />
 
       {graph.loading ? (
@@ -109,6 +110,8 @@ export default function CourseMap() {
 
       <SidePanel
         node={selectedNode}
+        nodes={graph.nodes}
+        edges={graph.edges}
         role={role}
         onClose={handleClosePanel}
         onMasteryChange={!isEducator ? handleMasteryChange : undefined}

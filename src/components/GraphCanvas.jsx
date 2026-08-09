@@ -1,11 +1,11 @@
 import React, { useCallback, useRef } from 'react';
-import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow } from 'reactflow';
+import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow, MarkerType } from 'reactflow';
 import ConceptNode from './ConceptNode.jsx';
-import TrailEdge from './TrailEdge.jsx';
+import DeletableEdge from './DeletableEdge.jsx';
 import './GraphCanvas.css';
 
 const nodeTypes = { concept: ConceptNode };
-const edgeTypes = { trail: TrailEdge };
+const edgeTypes = { deletable: DeletableEdge };
 
 const MASTERY_COLOR = {
   confident:  '#34d399',
@@ -31,14 +31,26 @@ export default function GraphCanvas({
     onRequestAddConcept(position);
   }, [isEducator, onRequestAddConcept, screenToFlowPosition]);
 
+  const defaultEdgeOptions = {
+    type: isEducator ? 'deletable' : 'smoothstep',
+    animated: false,
+    style: { stroke: 'rgba(108,99,255,0.6)', strokeWidth: 1.5 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: 'rgba(108,99,255,0.6)',
+      width: 16,
+      height: 16,
+    },
+  };
+
   return (
-    <div className="gc-wrapper" ref={wrapperRef} onDoubleClick={handlePaneDoubleClick}>
+    <div className={`gc-wrapper ${!isEducator ? 'student-mode' : ''}`} ref={wrapperRef} onDoubleClick={handlePaneDoubleClick}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        defaultEdgeOptions={{ type: 'trail' }}
+        defaultEdgeOptions={defaultEdgeOptions}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
