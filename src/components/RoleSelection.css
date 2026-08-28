@@ -1,0 +1,147 @@
+.rs-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  max-width: 640px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.rs-step {
+  font-size: 0.8rem;
+  color: var(--c-text-3);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.rs-heading {
+  font-size: 1.7rem;
+  margin-bottom: 8px;
+  color: #fff;
+  text-align: center;
+}
+
+.rs-subtext {
+  font-size: 1rem;
+  color: var(--c-text-2);
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.rs-cards {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 36px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.rs-card {
+  background: linear-gradient(160deg, rgba(41,37,36,0.9), rgba(41,37,36,0.6));
+  backdrop-filter: blur(10px);
+  border-radius: var(--r-lg);
+  padding: 26px;
+  min-width: 230px;
+  flex: 1;
+  cursor: pointer;
+  position: relative;
+  transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  border: 2px solid var(--c-border);
+  font-family: inherit;
+  color: inherit;
+}
+
+.rs-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--c-border-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.rs-card--selected {
+  border-color: var(--brand-accent);
+  box-shadow: var(--shadow-accent);
+}
+
+.rs-icon {
+  font-size: 2rem;
+  margin-bottom: 14px;
+}
+
+.rs-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.rs-card-desc {
+  font-size: 0.875rem;
+  color: var(--c-text-2);
+  line-height: 1.45;
+}
+
+.rs-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 3px 9px;
+  border-radius: var(--r-full);
+  font-weight: 700;
+}
+
+/* hover-reveal hint pills */
+.rs-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height var(--t-slow) var(--ease), opacity var(--t-base) var(--ease);
+}
+
+.rs-hints--visible {
+  max-height: 80px;
+  opacity: 1;
+}
+
+.rs-hint-pill {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brand-light);
+  background: var(--c-accent-glow);
+  border: 1px solid rgba(213,107,74,0.25);
+  border-radius: var(--r-full);
+  padding: 3px 9px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+}
+
+.rs-hints--visible .rs-hint-pill {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rs-continue {
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-card, .rs-hints, .rs-hint-pill { transition: none; }
+}

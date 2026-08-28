@@ -4,6 +4,7 @@ import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import Logo from './Logo.jsx';
+import GraphBackground from './GraphBackground.jsx';
 
 export default function EducatorDashboard() {
   const { user, logout } = useAuth();
@@ -52,7 +53,8 @@ export default function EducatorDashboard() {
 
   return (
     <div className="ls-shell">
-      <div className="ls-card animate-slide-up" style={{ minWidth: 600 }}>
+      <GraphBackground />
+      <div className="ls-card animate-slide-up" style={{ minWidth: 600, position: 'relative', zIndex: 1 }}>
         <div className="ls-course-header">
           <div>
             <Logo />

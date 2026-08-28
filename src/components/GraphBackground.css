@@ -1,0 +1,61 @@
+.gbg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gbg-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gbg-edge {
+  stroke: var(--c-border-2);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.5;
+}
+
+.gbg-pulse-dot {
+  filter: drop-shadow(0 0 4px var(--brand-light));
+}
+
+.gbg-node-dot {
+  fill: var(--brand-light);
+  opacity: 0.75;
+}
+
+.gbg-node-glow {
+  opacity: 0.35;
+}
+
+.gbg-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gbg-drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes gbg-drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(6px, -10px); }
+}
+
+/* subtle overall vignette so text laid over the background stays legible */
+.gbg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, var(--c-bg) 92%);
+}
+
+@media (max-width: 720px) {
+  .gbg { opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gbg-node { animation: none; }
+  .gbg-pulses { display: none; }
+}

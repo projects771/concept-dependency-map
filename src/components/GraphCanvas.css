@@ -36,6 +36,36 @@
   transform: scale(1.1);
 }
 
+/* ── selection-driven focus: dim unrelated nodes/edges, highlight the rest ── */
+.react-flow__node {
+  transition: opacity 220ms var(--ease, ease), filter 220ms var(--ease, ease);
+}
+
+.react-flow__node.cn-dimmed {
+  opacity: 0.32;
+  filter: grayscale(0.35);
+}
+
+.react-flow__node.cn-focus,
+.react-flow__node.cn-connected {
+  opacity: 1;
+}
+
+.react-flow__edge {
+  transition: opacity 220ms var(--ease, ease);
+}
+
+.react-flow__edge.edge-dimmed .react-flow__edge-path {
+  opacity: 0.18;
+}
+
+.react-flow__edge.edge-highlighted .react-flow__edge-path {
+  opacity: 1;
+  stroke: var(--brand-accent) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 6px var(--c-accent-glow));
+}
+
 /* student mode handles hidden */
 .student-mode .react-flow__handle {
   display: none !important;

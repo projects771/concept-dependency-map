@@ -29,6 +29,15 @@
   box-shadow: var(--shadow-accent) !important;
 }
 
+/* focus/connected states set by GraphCanvas when a node is selected */
+.react-flow__node.cn-focus .cn {
+  box-shadow: 0 0 0 2px var(--brand-accent), 0 0 24px var(--c-accent-glow);
+}
+
+.react-flow__node.cn-connected .cn {
+  box-shadow: 0 0 0 1px var(--mastery-dot), 0 0 14px var(--mastery-dim);
+}
+
 /* mastery border colors applied via CSS var */
 .cn--confident  { --mastery-dot: var(--c-confident); }
 .cn--learning   { --mastery-dot: var(--c-learning);  }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import GraphBackground from './GraphBackground.jsx';
 
 export default function CourseJoin() {
   const [chars, setChars] = useState(['', '', '', '', '', '']);
@@ -88,7 +89,8 @@ export default function CourseJoin() {
 
   return (
     <div className="ls-shell" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: 'var(--c-bg, #111)', padding: '20px' }}>
-      <div style={{ maxWidth: '480px', width: '100%', padding: '40px', backgroundColor: 'var(--c-surface, #1e1e1e)', borderRadius: '12px', border: '1px solid var(--c-border, #333)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <GraphBackground />
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '480px', width: '100%', padding: '40px', backgroundColor: 'rgba(30, 30, 30, 0.75)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid var(--c-border, #333)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔗</div>
         <h2 style={{ color: 'var(--brand-accent, #3b82f6)', fontWeight: 'bold', fontSize: '1.3rem', marginBottom: '8px', textAlign: 'center' }}>Enter your course code</h2>
         <p style={{ color: 'var(--c-text-muted, #9ca3af)', textAlign: 'center', marginBottom: '32px', fontSize: '0.95rem' }}>Your educator shared a 6-character code to join their course map</p>
@@ -150,7 +152,7 @@ export default function CourseJoin() {
       </div>
 
       {enrolledCourses.length > 0 && (
-        <div style={{ maxWidth: '480px', width: '100%', marginTop: '32px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '480px', width: '100%', marginTop: '32px' }}>
           <h3 style={{ color: 'var(--c-text-muted, #9ca3af)', fontSize: '1rem', marginBottom: '16px', borderBottom: '1px solid var(--c-border, #333)', paddingBottom: '8px' }}>My enrolled courses</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {enrolledCourses.map(course => (

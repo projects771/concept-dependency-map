@@ -1,0 +1,190 @@
+.lp-shell {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-bg);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.lp-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(28, 25, 23, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.lp-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+}
+
+.lp-nav-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.lp-hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-10);
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 150px 32px 60px;
+}
+
+.lp-hero-copy {
+  max-width: 520px;
+  animation: slide-up var(--t-slow) var(--ease) both;
+}
+
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--c-accent-glow);
+  color: var(--brand-light);
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  border: 1px solid rgba(213,107,74,0.25);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 24px;
+}
+
+.lp-headline {
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 600;
+  margin: 0 0 22px 0;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.lp-sub {
+  color: var(--c-text-2);
+  font-size: 1.08rem;
+  max-width: 520px;
+  margin: 0 0 36px 0;
+  line-height: 1.65;
+}
+
+.lp-cta-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.lp-cta {
+  padding: 12px 22px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-hero-visual {
+  flex-shrink: 0;
+  animation: scale-in 600ms var(--ease) 150ms both;
+}
+
+/* ── Feature cards ─────────────────────────────────────────── */
+.lp-features {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-6);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px 100px;
+}
+
+.lp-feature-card {
+  background: linear-gradient(160deg, rgba(41,37,36,0.85), rgba(41,37,36,0.55));
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  border: 1px solid var(--c-border);
+  backdrop-filter: blur(8px);
+  transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+
+.lp-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--c-border-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.lp-feature-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  font-size: 1.3rem;
+  margin-bottom: var(--sp-4);
+}
+
+.lp-feature-glyph--accent  { background: var(--c-accent-glow); color: var(--brand-light); }
+.lp-feature-glyph--warning { background: rgba(251,191,36,0.12); color: var(--c-warning); }
+.lp-feature-glyph--info    { background: rgba(96,165,250,0.12); color: var(--c-info); }
+
+.lp-feature-title {
+  color: var(--c-text);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.lp-feature-desc {
+  color: var(--c-text-2);
+  margin: 0;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.lp-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 24px 40px;
+  font-size: 12px;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .lp-hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 120px;
+  }
+  .lp-hero-copy { max-width: 100%; }
+  .lp-cta-row { justify-content: center; }
+  .lp-headline { font-size: 2.3rem; }
+}
+
+@media (max-width: 480px) {
+  .lp-headline { font-size: 1.9rem; }
+  .lp-nav-inner { padding: 12px 16px; }
+}

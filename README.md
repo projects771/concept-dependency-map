@@ -1,63 +1,125 @@
-# Waypoint — Concept Dependency Map (Frontend)
+# Nodemap UI/UX update — how to apply
 
-A React Flow canvas where educators map prerequisite relationships between
-concepts, and students see exactly why they're learning something — and
-where a gap further back on the trail might be causing trouble up ahead.
+This is a **partial update**: only the files listed below changed. Everything
+else in your project (auth, API, hooks, dagre layout, package.json, vite
+config, .env, dashboards' data logic, etc.) is untouched — copy these files
+over the matching paths in your existing `src/components/` folder and you're
+done. Do NOT delete your project and start over; just overwrite these files.
 
-## Run it
+## FILES TO REPLACE (existing files, modified)
+- src/components/LandingPage.jsx
+- src/components/RoleSelection.jsx
+- src/components/GraphCanvas.jsx
+- src/components/GraphCanvas.css
+- src/components/ConceptNode.css
+- src/components/CourseMap.jsx
+- src/components/CourseJoin.jsx
+- src/components/EducatorDashboard.jsx
+
+## NEW FILES (add these)
+- src/components/GraphBackground.jsx
+- src/components/GraphBackground.css
+- src/components/ConceptOrbit.jsx
+- src/components/ConceptOrbit.css
+- src/components/LandingPage.css
+- src/components/RoleSelection.css
+
+## FILES TO KEEP (not touched at all)
+Everything else: `.env`, `package.json`, `package-lock.json`,
+`vite.config.js`, `index.html`, `docx.html`, `.github/`, `public/`,
+`src/App.jsx`, `src/main.jsx`, `src/styles/index.css`, `src/api/api.js`,
+`src/hooks/useGraph.js`, `src/context/*`, `src/components/Logo.jsx`,
+`src/components/Toolbar.jsx` + `.css`, `src/components/SidePanel.jsx` +
+`.css`, `src/components/ConceptNode.jsx`, `src/components/AddConceptDialog.*`,
+`src/components/AnalyticsPanel.jsx`, `src/components/DeletableEdge.jsx`,
+`src/components/TrailEdge.jsx`, `src/components/Auth/*`,
+`src/components/LandingScreen.jsx` + `.css` (this appears to be an older,
+unused screen — it's not referenced by any route in App.jsx, so it was left
+alone; safe to delete later if you confirm it's dead code).
+
+No `package.json` changes were needed — everything below uses only CSS/SVG
+that ships with the browser, so **no new dependencies were added**.
+
+---
+
+## What changed and why
+
+**1. `GraphBackground.jsx`/`.css`** — new reusable component: a quiet
+animated knowledge-graph backdrop (drifting nodes, connecting lines, a
+few light pulses traveling along some edges). Mounted behind the landing
+page, role-selection screen, educator dashboard, and course-join screen.
+It's `position: absolute`, `pointer-events: none`, and respects
+`prefers-reduced-motion`, so it never interferes with clicks or a11y.
+
+**2. `ConceptOrbit.jsx`/`.css`** — the hero interaction on the landing
+page: a central "Data Structures" node with six related concepts
+(Arrays, Recursion, Trees, Graphs, Sorting, Dynamic Programming) orbiting
+around it on connecting spokes. Built with two opposing CSS rotations
+(the ring rotates, the cards counter-rotate) so it stays upright and
+never needs a JS animation loop — cheap on CPU/battery. Pauses on hover.
+
+**3. `LandingPage.jsx`/`.css`** — rebuilt off inline styles into a real
+stylesheet: glass/blurred sticky nav, the orbit hero, and premium
+feature cards with hover lift. Content and links are unchanged (still
+routes to `/join`).
+
+**4. `RoleSelection.jsx`/`.css`** — same functionality (pick
+educator/student, continue to sign-in), rebuilt with real CSS, a
+graph background, and hover-reveal pill tags under each role card
+(Courses/Class analytics/Knowledge graphs for educators; Learning
+paths/Concept mastery/Knowledge gaps for students) per your spec.
+
+**5. `GraphCanvas.jsx`/`.css` + `ConceptNode.css`** — when a node is
+selected, connected nodes/edges are now computed (`useMemo`) and the
+rest of the graph dims (opacity + slight grayscale) while the selected
+node gets a colored glow and its direct edges highlight and animate
+(ReactFlow's built‑in dashed "flow" animation, orange accent, glow).
+This is purely additive — existing zoom, minimap, node drag, edge
+delete, and add-concept behavior are all untouched.
+
+**6. `CourseMap.jsx`** — one-line change: passes `selectedNodeId` down
+to `GraphCanvas` so it knows what's selected. No behavior change
+otherwise.
+
+**7. `CourseJoin.jsx` / `EducatorDashboard.jsx`** — added the animated
+background behind the existing card layout and made the card
+semi-transparent + blurred (glass) so the background reads through.
+All existing logic (join by code, create course, share code, etc.)
+is untouched.
+
+---
+
+## Install & run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the printed local URL. No backend is required — every API call in
-`src/api/api.js` automatically falls back to realistic mock data if the
-real endpoint isn't reachable, so the app is fully interactive out of the box.
+Verify at the local dev URL, then:
 
-## Where each task lives
+```bash
+npm run build
+```
 
-| Task | Files |
-| --- | --- |
-| 1 — Graph canvas (drag, persist, edge delete, double-click to add) | `components/GraphCanvas.jsx`, `hooks/useGraph.js` |
-| 2 — ConceptNode + slide-in side panel | `components/ConceptNode.jsx`, `components/SidePanel.jsx` |
-| 3 — Toolbar + Educator/Student modes | `components/Toolbar.jsx`, `App.jsx` (`mode` state) |
-| 4 — Mastery tracker | `components/SidePanel.jsx` (toggle), `hooks/useGraph.js` (`setMastery`) |
-| 5 — Gap highlight overlay | `hooks/useGraph.js` (`setMastery` → `fetchGaps`), `ConceptNode.jsx` (`gapRisk` badge) |
-| 6 — API wiring, loading/error states | `api/api.js`, `hooks/useGraph.js` (`loading`, `error`, `saving`, `mockMode`) |
+This regenerates `dist/` from source (Vite `base` in `vite.config.js` is
+already `/concept-dependency-map/`, which is correct for GitHub Pages —
+I didn't need to touch it).
 
-## How the mock/real backend swap works
+## Deploy
 
-Every function in `api/api.js` tries the real `/api/...` endpoint first.
-If that request fails — which is exactly what happens right now, since
-there's no backend running — it transparently falls back to in-memory
-mock data after a small simulated delay. The rest of the app never knows
-the difference. Once Person B's routes are live, these calls will just
-start succeeding; no calling code needs to change.
+Commit the changed/new files above (and the regenerated `dist/` if your
+GitHub Pages deployment serves `dist/` directly from the repo — check your
+`.github/workflows` deploy action; if it builds on push instead, you only
+need to commit source). Push to `main`. Your existing GitHub Actions
+workflow will publish to:
+https://projects771.github.io/concept-dependency-map/
 
-The toolbar shows a small **"Demo data"** badge whenever the app is
-running on mocks, and a **"Saving…"** indicator whenever a write is in
-flight, so it's always clear what state the data is in.
+## What I did NOT change in this pass
 
-## Interaction reference
-
-- **Educator mode**: drag nodes (position is saved on drop), drag from
-  one node's edge to another to add a dependency, double-click empty
-  canvas to add a concept there, select an edge or node and press
-  Delete/Backspace to remove it.
-- **Student mode**: the graph is read-only structurally — no dragging,
-  connecting, adding, or deleting. Clicking a waypoint still opens the
-  side panel so a student can set their own mastery status.
-- **Either mode**: click any waypoint to open the side panel with its
-  description, resources, and mastery toggle. Marking a concept
-  "Struggling" checks for at-risk downstream concepts and marks them
-  with a red "⚠️ gap risk" badge on the canvas.
-
-## Design notes
-
-The visual language is a trail map: concepts are waypoints, dependencies
-are dashed trails, and "lost" understanding is, literally, losing the
-trail. The background contour-line field, the minimap as a "you are
-here" inset, and the mastery colors (moss = confident, brass = learning,
-rust = struggling) all come from that one metaphor — see
-`src/styles/index.css` for the token system.
+To keep this a safe, reviewable diff rather than a risky rewrite, I did not
+touch: the concept-map editing toolbar, side panel, analytics panel, add-
+concept dialog, sign-in/register screens, auth context, or the dagre
+auto-layout logic. If you want the same treatment (animated background +
+polish) applied to those screens next, say the word and I'll do another
+focused pass — happy to keep going file by file rather than one giant drop.

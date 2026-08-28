@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow, MarkerType } from 'reactflow';
 import ConceptNode from './ConceptNode.jsx';
 import DeletableEdge from './DeletableEdge.jsx';
@@ -19,10 +19,50 @@ export default function GraphCanvas({
   onNodeClick, onNodeDragStop,
   onConnect, onEdgesDelete, onNodesDelete,
   onRequestAddConcept,
+  selectedNodeId,
 }) {
   const wrapperRef = useRef(null);
   const { screenToFlowPosition } = useReactFlow();
   const isEducator = role === 'educator';
+
+  // When a node is selected, work out which other nodes/edges are directly
+  // connected to it so we can dim everything else and highlight the
+  // dependency relationships — makes the graph's structure legible at a glance.
+  const connected = useMemo(() => {
+    if (!selectedNodeId) return null;
+    const nodeIds = new Set([selectedNodeId]);
+    const edgeIds = new Set();
+    edges.forEach((e) => {
+      if (e.source === selectedNodeId || e.target === selectedNodeId) {
+        edgeIds.add(e.id);
+        nodeIds.add(e.source);
+        nodeIds.add(e.target);
+      }
+    });
+    return { nodeIds, edgeIds };
+  }, [selectedNodeId, edges]);
+
+  const displayNodes = useMemo(() => {
+    if (!connected) return nodes;
+    return nodes.map((n) => {
+      const extra = n.id === selectedNodeId
+        ? 'cn-focus'
+        : connected.nodeIds.has(n.id) ? 'cn-connected' : 'cn-dimmed';
+      return { ...n, className: [n.className, extra].filter(Boolean).join(' ') };
+    });
+  }, [nodes, connected, selectedNodeId]);
+
+  const displayEdges = useMemo(() => {
+    if (!connected) return edges;
+    return edges.map((e) => {
+      const isRelated = connected.edgeIds.has(e.id);
+      return {
+        ...e,
+        className: [e.className, isRelated ? 'edge-highlighted' : 'edge-dimmed'].filter(Boolean).join(' '),
+        animated: isRelated ? true : e.animated,
+      };
+    });
+  }, [edges, connected]);
 
   const handlePaneDoubleClick = useCallback((event) => {
     if (!isEducator || !onRequestAddConcept) return;
@@ -46,8 +86,8 @@ export default function GraphCanvas({
   return (
     <div className={`gc-wrapper ${!isEducator ? 'student-mode' : ''}`} ref={wrapperRef} onDoubleClick={handlePaneDoubleClick}>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={displayNodes}
+        edges={displayEdges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         defaultEdgeOptions={defaultEdgeOptions}

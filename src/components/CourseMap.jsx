@@ -104,6 +104,7 @@ export default function CourseMap() {
             onEdgesDelete={isEducator ? handleEdgesDelete : undefined}
             onNodesDelete={isEducator ? handleNodesDelete : undefined}
             onRequestAddConcept={isEducator ? handleRequestAddConcept : undefined}
+            selectedNodeId={selectedNodeId}
           />
         </ReactFlowProvider>
       )}
