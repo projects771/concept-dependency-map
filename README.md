@@ -1,4 +1,4 @@
-# Nodemap update #2 — how to apply
+# Nodemap — how it works
 
 Another **partial, additive update**. Copy these files over the matching
 paths in your project (overwrite). Nothing else changes — same repo
