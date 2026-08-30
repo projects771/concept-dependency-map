@@ -1,125 +1,156 @@
-# Nodemap UI/UX update — how to apply
+# Nodemap update #2 — how to apply
 
-This is a **partial update**: only the files listed below changed. Everything
-else in your project (auth, API, hooks, dagre layout, package.json, vite
-config, .env, dashboards' data logic, etc.) is untouched — copy these files
-over the matching paths in your existing `src/components/` folder and you're
-done. Do NOT delete your project and start over; just overwrite these files.
+Another **partial, additive update**. Copy these files over the matching
+paths in your project (overwrite). Nothing else changes — same repo
+structure, same `.env`, same backend/API, same routes.
 
-## FILES TO REPLACE (existing files, modified)
+## FILES TO REPLACE (existing, modified)
+- src/styles/index.css          ← **the scroll-bug fix is here**
 - src/components/LandingPage.jsx
-- src/components/RoleSelection.jsx
+- src/components/LandingPage.css
+- src/components/GraphBackground.css
 - src/components/GraphCanvas.jsx
 - src/components/GraphCanvas.css
-- src/components/ConceptNode.css
-- src/components/CourseMap.jsx
-- src/components/CourseJoin.jsx
 - src/components/EducatorDashboard.jsx
 
 ## NEW FILES (add these)
-- src/components/GraphBackground.jsx
-- src/components/GraphBackground.css
-- src/components/ConceptOrbit.jsx
-- src/components/ConceptOrbit.css
-- src/components/LandingPage.css
-- src/components/RoleSelection.css
+- src/components/GraphAmbientBackground.jsx
+- src/components/GraphAmbientBackground.css
+- src/components/MiniDependencyChain.jsx
+- src/components/MiniDependencyChain.css
 
-## FILES TO KEEP (not touched at all)
-Everything else: `.env`, `package.json`, `package-lock.json`,
-`vite.config.js`, `index.html`, `docx.html`, `.github/`, `public/`,
-`src/App.jsx`, `src/main.jsx`, `src/styles/index.css`, `src/api/api.js`,
-`src/hooks/useGraph.js`, `src/context/*`, `src/components/Logo.jsx`,
-`src/components/Toolbar.jsx` + `.css`, `src/components/SidePanel.jsx` +
-`.css`, `src/components/ConceptNode.jsx`, `src/components/AddConceptDialog.*`,
-`src/components/AnalyticsPanel.jsx`, `src/components/DeletableEdge.jsx`,
-`src/components/TrailEdge.jsx`, `src/components/Auth/*`,
-`src/components/LandingScreen.jsx` + `.css` (this appears to be an older,
-unused screen — it's not referenced by any route in App.jsx, so it was left
-alone; safe to delete later if you confirm it's dead code).
-
-No `package.json` changes were needed — everything below uses only CSS/SVG
-that ships with the browser, so **no new dependencies were added**.
+## FILES TO KEEP — everything else
+`.env`, `package.json`, `package-lock.json`, `vite.config.js`, `index.html`,
+`.github/`, `public/`, `src/App.jsx`, `src/main.jsx`, `src/api/api.js`,
+`src/hooks/useGraph.js`, `src/context/*`, `Logo.jsx`, `ConceptOrbit.jsx/.css`,
+`RoleSelection.jsx/.css`, `CourseJoin.jsx`, `CourseMap.jsx`,
+`ConceptNode.jsx/.css`, `Toolbar.*`, `SidePanel.*`, `AddConceptDialog.*`,
+`AnalyticsPanel.jsx`, `DeletableEdge.jsx`, `TrailEdge.jsx`, `Auth/*`. No new
+npm dependencies — everything here is plain CSS/SVG/React state.
 
 ---
 
-## What changed and why
+## 1. The scrolling bug — root cause & fix
 
-**1. `GraphBackground.jsx`/`.css`** — new reusable component: a quiet
-animated knowledge-graph backdrop (drifting nodes, connecting lines, a
-few light pulses traveling along some edges). Mounted behind the landing
-page, role-selection screen, educator dashboard, and course-join screen.
-It's `position: absolute`, `pointer-events: none`, and respects
-`prefers-reduced-motion`, so it never interferes with clicks or a11y.
+Your `src/styles/index.css` had:
 
-**2. `ConceptOrbit.jsx`/`.css`** — the hero interaction on the landing
-page: a central "Data Structures" node with six related concepts
-(Arrays, Recursion, Trees, Graphs, Sorting, Dynamic Programming) orbiting
-around it on connecting spokes. Built with two opposing CSS rotations
-(the ring rotates, the cards counter-rotate) so it stays upright and
-never needs a JS animation loop — cheap on CPU/battery. Pauses on hover.
+```css
+html, body, #root { height: 100%; }
+body { ...; overflow: hidden; }
+```
 
-**3. `LandingPage.jsx`/`.css`** — rebuilt off inline styles into a real
-stylesheet: glass/blurred sticky nav, the orbit hero, and premium
-feature cards with hover lift. Content and links are unchanged (still
-routes to `/join`).
+`overflow: hidden` on `body`, combined with `height: 100%` everywhere,
+locked the *entire document* to one viewport height — so any landing-page
+content past the hero was clipped and un-scrollable, exactly what you saw.
 
-**4. `RoleSelection.jsx`/`.css`** — same functionality (pick
-educator/student, continue to sign-in), rebuilt with real CSS, a
-graph background, and hover-reveal pill tags under each role card
-(Courses/Class analytics/Knowledge graphs for educators; Learning
-paths/Concept mastery/Knowledge gaps for students) per your spec.
+The fix:
+- `body` no longer has `overflow: hidden`. The page can scroll normally now.
+- `.app-shell` (the concept-graph editor wrapper) is now `position: fixed;
+  inset: 0; overflow: hidden;` instead of a relative 100%-height box. It's
+  now **self-contained** — it fills the viewport and clips its own content
+  (the ReactFlow canvas) regardless of whether the body scrolls, so the
+  graph editor keeps behaving exactly like before.
+- The role-selection / sign-in / course-join / dashboard screens already
+  used `.ls-shell { position: fixed; inset: 0; }`, so they were already
+  self-contained and needed no change.
+- `GraphBackground` (the landing-page knowledge-graph backdrop) switched
+  from `position: absolute` to `position: fixed`, so it now stays pinned
+  behind the content as you scroll the long landing page, instead of
+  stretching to the full page height.
 
-**5. `GraphCanvas.jsx`/`.css` + `ConceptNode.css`** — when a node is
-selected, connected nodes/edges are now computed (`useMemo`) and the
-rest of the graph dims (opacity + slight grayscale) while the selected
-node gets a colored glow and its direct edges highlight and animate
-(ReactFlow's built‑in dashed "flow" animation, orange accent, glow).
-This is purely additive — existing zoom, minimap, node drag, edge
-delete, and add-concept behavior are all untouched.
+This is the single highest-priority fix in this batch — test it first.
 
-**6. `CourseMap.jsx`** — one-line change: passes `selectedNodeId` down
-to `GraphCanvas` so it knows what's selected. No behavior change
-otherwise.
+## 2. Landing page — new sections
 
-**7. `CourseJoin.jsx` / `EducatorDashboard.jsx`** — added the animated
-background behind the existing card layout and made the card
-semi-transparent + blurred (glass) so the background reads through.
-All existing logic (join by code, create course, share code, etc.)
-is untouched.
+`LandingPage.jsx` now includes, in order:
+
+1. **Navbar** (unchanged)
+2. **Hero** (unchanged — orbit + headline)
+3. **Feature cards** (unchanged)
+4. **What is Nodemap?** — short explainer paragraph
+5. **How Nodemap works** — 4 numbered steps (Map → Learn → Identify gaps →
+   Improve) connected by an animated traveling-dot line between them
+6. **For students** — bullet list + a small animated dependency chain
+   (Arrays → Searching → Graphs → Algorithms)
+7. **For educators** — bullet list + a small "class mastery" heatmap of
+   concept chips (confident/learning/struggling color-coded)
+8. **About Nodemap** — the storytelling section: explains the "why, not
+   just completed/not-completed" idea, illustrated by a dependency chain
+   (Data Structures → Recursion → Trees → Graph Theory → Graph Algorithms)
+   with the first node marked "struggling" and everything downstream
+   marked "at risk" — a direct visual of gap propagation
+9. **Meet the creators** — contact cards for **Nawal Kishore S Pai**
+   (`nawalkishoresatishpai@gmail.com`) and **Gokul B**
+   (`gokulb7776@gmail.com`), taken exactly from your reference screenshot,
+   each a `mailto:` link with a hover-lift glass card
+10. **Footer** (unchanged)
+
+`MiniDependencyChain.jsx` is a small reusable component used in both the
+"For students" and "About" sections — a vertical chain of concept nodes
+connected by arrows. Pass it a `weakIndex` to mark a node as struggling and
+auto-flag everything below it as "at risk"; without one, it gently
+auto-cycles which node looks "active" (paused under `prefers-reduced-motion`).
+
+## 3. Concept graph page — ambient background
+
+`GraphAmbientBackground.jsx` is a new decorative layer mounted behind the
+ReactFlow canvas in `GraphCanvas.jsx`: a faint dot grid (masked so it fades
+toward the edges) plus a soft glow that drifts very slightly toward the
+mouse position (throttled with `requestAnimationFrame`, a single
+`mousemove` listener, no React re-renders). It's `pointer-events: none` and
+sits at a lower z-index than the graph, so panning/zooming/clicking nodes
+is completely unaffected. Disabled under `prefers-reduced-motion`.
+
+## 4. Node hover + selection highlighting
+
+`GraphCanvas.jsx` previously only dimmed unrelated nodes/edges when a node
+was **selected**. It now does the same thing on **hover** too (selection
+still takes priority if something is selected) — hovering a concept now
+raises it (existing CSS), highlights its direct dependencies, and dims the
+rest of the graph, exactly per your spec. This uses ReactFlow's built-in
+`onNodeMouseEnter`/`onNodeMouseLeave` props — no new dependency.
+
+## 5. Educator dashboard — course cards
+
+Course list items were inline-styled `<li>`s; they're now a `.edu-course-card`
+class with a hover lift + border glow + shadow, defined in
+`src/styles/index.css`. No behavioral change — same links, same copy-code
+button, same student count.
 
 ---
 
-## Install & run
+## What I did NOT touch in this pass
+
+- Role-selection cards, course-join screen, and `ConceptOrbit` were already
+  updated in the previous batch and are untouched here.
+- Toolbar, SidePanel, AddConceptDialog, AnalyticsPanel — not touched.
+- No parallax/mouse response was added to the *landing page* background
+  (only the graph page) to avoid overloading the already-content-heavy
+  scrolling page with motion; let me know if you want that too.
+
+## Install & verify
 
 ```bash
 npm install
 npm run dev
 ```
 
-Verify at the local dev URL, then:
+Checklist:
+- [ ] Landing page scrolls all the way to the footer, mouse wheel and
+      trackpad both work, no clipped content
+- [ ] Concept-graph editor still fills the screen with no page-level
+      scrollbar (it's a fixed, self-contained view)
+- [ ] Hovering a node in the graph dims unrelated nodes/edges
+- [ ] Creators section shows the correct names/emails and `mailto:` links open your mail client
+- [ ] Existing auth/course flows still work unchanged
+
+Then:
 
 ```bash
 npm run build
 ```
 
-This regenerates `dist/` from source (Vite `base` in `vite.config.js` is
-already `/concept-dependency-map/`, which is correct for GitHub Pages —
-I didn't need to touch it).
-
-## Deploy
-
-Commit the changed/new files above (and the regenerated `dist/` if your
-GitHub Pages deployment serves `dist/` directly from the repo — check your
-`.github/workflows` deploy action; if it builds on push instead, you only
-need to commit source). Push to `main`. Your existing GitHub Actions
-workflow will publish to:
-https://projects771.github.io/concept-dependency-map/
-
-## What I did NOT change in this pass
-
-To keep this a safe, reviewable diff rather than a risky rewrite, I did not
-touch: the concept-map editing toolbar, side panel, analytics panel, add-
-concept dialog, sign-in/register screens, auth context, or the dagre
-auto-layout logic. If you want the same treatment (animated background +
-polish) applied to those screens next, say the word and I'll do another
-focused pass — happy to keep going file by file rather than one giant drop.
+`vite.config.js`'s `base: '/concept-dependency-map/'` wasn't touched, so
+GitHub Pages deployment is unaffected — commit source (and `dist/` if your
+Pages workflow serves it directly instead of building on push) and push to
+`main`.

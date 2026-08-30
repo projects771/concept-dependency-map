@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow, MarkerType } from 'reactflow';
 import ConceptNode from './ConceptNode.jsx';
 import DeletableEdge from './DeletableEdge.jsx';
+import GraphAmbientBackground from './GraphAmbientBackground.jsx';
 import './GraphCanvas.css';
 
 const nodeTypes = { concept: ConceptNode };
@@ -24,33 +25,37 @@ export default function GraphCanvas({
   const wrapperRef = useRef(null);
   const { screenToFlowPosition } = useReactFlow();
   const isEducator = role === 'educator';
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
 
-  // When a node is selected, work out which other nodes/edges are directly
-  // connected to it so we can dim everything else and highlight the
-  // dependency relationships — makes the graph's structure legible at a glance.
+  const focusNodeId = selectedNodeId || hoveredNodeId;
+
+  // When a node is selected (or, absent a selection, hovered), work out which
+  // other nodes/edges are directly connected to it so we can dim everything
+  // else and highlight the dependency relationships — makes the graph's
+  // structure legible at a glance.
   const connected = useMemo(() => {
-    if (!selectedNodeId) return null;
-    const nodeIds = new Set([selectedNodeId]);
+    if (!focusNodeId) return null;
+    const nodeIds = new Set([focusNodeId]);
     const edgeIds = new Set();
     edges.forEach((e) => {
-      if (e.source === selectedNodeId || e.target === selectedNodeId) {
+      if (e.source === focusNodeId || e.target === focusNodeId) {
         edgeIds.add(e.id);
         nodeIds.add(e.source);
         nodeIds.add(e.target);
       }
     });
     return { nodeIds, edgeIds };
-  }, [selectedNodeId, edges]);
+  }, [focusNodeId, edges]);
 
   const displayNodes = useMemo(() => {
     if (!connected) return nodes;
     return nodes.map((n) => {
-      const extra = n.id === selectedNodeId
+      const extra = n.id === focusNodeId
         ? 'cn-focus'
         : connected.nodeIds.has(n.id) ? 'cn-connected' : 'cn-dimmed';
       return { ...n, className: [n.className, extra].filter(Boolean).join(' ') };
     });
-  }, [nodes, connected, selectedNodeId]);
+  }, [nodes, connected, focusNodeId]);
 
   const displayEdges = useMemo(() => {
     if (!connected) return edges;
@@ -71,6 +76,9 @@ export default function GraphCanvas({
     onRequestAddConcept(position);
   }, [isEducator, onRequestAddConcept, screenToFlowPosition]);
 
+  const handleNodeMouseEnter = useCallback((_e, node) => setHoveredNodeId(node.id), []);
+  const handleNodeMouseLeave = useCallback(() => setHoveredNodeId(null), []);
+
   const defaultEdgeOptions = {
     type: isEducator ? 'deletable' : 'smoothstep',
     animated: false,
@@ -85,6 +93,7 @@ export default function GraphCanvas({
 
   return (
     <div className={`gc-wrapper ${!isEducator ? 'student-mode' : ''}`} ref={wrapperRef} onDoubleClick={handlePaneDoubleClick}>
+      <GraphAmbientBackground />
       <ReactFlow
         nodes={displayNodes}
         edges={displayEdges}
@@ -95,6 +104,8 @@ export default function GraphCanvas({
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         onNodeDragStop={onNodeDragStop}
+        onNodeMouseEnter={handleNodeMouseEnter}
+        onNodeMouseLeave={handleNodeMouseLeave}
         onConnect={onConnect}
         onEdgesDelete={onEdgesDelete}
         onNodesDelete={onNodesDelete}

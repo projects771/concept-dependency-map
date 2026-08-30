@@ -4,7 +4,7 @@
   z-index: 2;
 }
 
-.react-flow { background: transparent; }
+.react-flow { background: transparent; position: relative; z-index: 1; }
 
 /* ── custom edges ── */
 .deletable-edge-path {

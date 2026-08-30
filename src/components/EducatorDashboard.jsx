@@ -77,7 +77,7 @@ export default function EducatorDashboard() {
         ) : courses.length > 0 ? (
           <ul className="ls-course-list">
             {courses.map(course => (
-              <li key={course.id} style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 20px', background: 'var(--c-surface-2)', borderRadius: 'var(--r-md)', marginBottom: 12 }}>
+              <li key={course.id} className="edu-course-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div className="ls-course-title" style={{ fontSize: 16 }}>{course.title}</div>

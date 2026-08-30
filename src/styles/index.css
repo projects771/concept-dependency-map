@@ -80,7 +80,8 @@
 /* ── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root { height: 100%; }
+html, body, #root { min-height: 100%; }
+html { overflow-x: hidden; }
 
 body {
   font-family: var(--font-sans);
@@ -90,7 +91,11 @@ body {
   background: var(--c-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  /* NOTE: intentionally NOT overflow:hidden here — that was clipping the
+     landing page so it couldn't scroll past the hero. Full-viewport "app"
+     views (the concept graph editor, auth/onboarding screens) are
+     self-contained via position:fixed below, so they don't depend on the
+     body being locked. */
 }
 
 /* ── Background field ──────────────────────────────────────── */
@@ -303,9 +308,36 @@ textarea.input { resize: vertical; line-height: 1.5; }
 
 /* ── App shell ─────────────────────────────────────────────── */
 .app-shell {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* ── Educator dashboard: course cards ─────────────────────────*/
+.edu-course-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--c-surface-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  margin-bottom: 12px;
+  transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), background var(--t-base) var(--ease);
+}
+
+.edu-course-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--c-border-2);
+  background: var(--c-surface-3);
+  box-shadow: var(--shadow-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edu-course-card { transition: none; }
 }
 
 /* ── Loading screen ────────────────────────────────────────── */
