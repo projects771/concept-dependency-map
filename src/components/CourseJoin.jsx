@@ -19,9 +19,12 @@ export default function CourseJoin() {
     // Fetch enrolled courses
     const loadCourses = async () => {
       try {
-        const courses = await api.fetchCourses();
-        if (courses) {
+        const res = await api.fetchCourses();
+        const courses = res?.courses || [];
+        if (courses.length > 0) {
           setEnrolledCourses(courses);
+          // Cache enrolled course IDs in localStorage as fallback
+          localStorage.setItem('enrolled_courses', JSON.stringify(courses.map(c => c.id)));
         }
       } catch (err) {
         console.error('Error fetching courses:', err);

@@ -44,7 +44,7 @@ function toFlowNode(concept, masteryMap = {}) {
     resources = concept.resources;
   }
   return {
-    id: concept.id,
+    id: String(concept.id),
     type: NODE_TYPE,
     position: { x: Number(concept.x) || 0, y: Number(concept.y) || 0 },
     data: {
@@ -59,8 +59,8 @@ function toFlowNode(concept, masteryMap = {}) {
 }
 
 function toFlowEdge(edge) {
-  const source = edge.from   ?? edge.source;
-  const target = edge.to     ?? edge.target;
+  const source = String(edge.from   ?? edge.source);
+  const target = String(edge.to     ?? edge.target);
   return { id: edge.id ?? `e${source}-${target}`, source, target };
 }
 
@@ -100,7 +100,13 @@ export function useGraph(courseId, toast) {
         }
         
         let loadedNodes = concepts.map((c) => toFlowNode(c, masteryMap));
-        const loadedEdges = edges.map(toFlowEdge);
+        const rawEdges = edges.map(toFlowEdge);
+
+        // Filter out ghost edges (source/target node was deleted)
+        const validNodeIds = new Set(loadedNodes.map(n => n.id));
+        const loadedEdges = rawEdges.filter(e =>
+          validNodeIds.has(e.source) && validNodeIds.has(e.target)
+        );
         
         if (needsLayout(loadedNodes)) {
           const layouted = getLayoutedElements(loadedNodes, loadedEdges);

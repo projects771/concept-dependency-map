@@ -5,8 +5,9 @@
   gap: var(--sp-3);
   width: auto;
   max-width: 160px;
-  height: 44px;
-  padding: 10px 16px;
+  min-height: 44px;
+  padding: 8px 16px;
+  box-sizing: border-box;
   background: #1e2130;
   border: 1.5px solid rgba(255,255,255,0.12);
   border-left: 3px solid var(--mastery-dot);
