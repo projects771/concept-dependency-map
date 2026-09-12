@@ -94,3 +94,9 @@ export const googleAuth = (accessToken, role) =>
 
 export const joinCourse = (courseCode) =>
   request('/api/courses/join', { method: 'POST', body: JSON.stringify({ courseCode }) });
+
+// Dedicated "courses I'm enrolled in" endpoint for the student dashboard.
+// NOTE: this endpoint isn't part of the frontend repo, so its existence on
+// the backend can't be verified from here. If it 404s (not implemented yet),
+// callers should fall back to fetchCourses().
+export const fetchEnrolledCourses = () => request('/api/courses/enrolled');

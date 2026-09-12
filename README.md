@@ -1,156 +1,95 @@
-# Nodemap — how it works
+# Nodemap — Concept Dependency Map
 
-Another **partial, additive update**. Copy these files over the matching
-paths in your project (overwrite). Nothing else changes — same repo
-structure, same `.env`, same backend/API, same routes.
+An interactive knowledge-dependency mapping platform. Courses are modeled
+as a connected graph of concepts and prerequisites: students see exactly
+which gaps are blocking their progress, and educators see class-wide
+weaknesses in one view.
 
-## FILES TO REPLACE (existing, modified)
-- src/styles/index.css          ← **the scroll-bug fix is here**
-- src/components/LandingPage.jsx
-- src/components/LandingPage.css
-- src/components/GraphBackground.css
-- src/components/GraphCanvas.jsx
-- src/components/GraphCanvas.css
-- src/components/EducatorDashboard.jsx
+Live: https://projects771.github.io/concept-dependency-map/
 
-## NEW FILES (add these)
-- src/components/GraphAmbientBackground.jsx
-- src/components/GraphAmbientBackground.css
-- src/components/MiniDependencyChain.jsx
-- src/components/MiniDependencyChain.css
+## Stack
 
-## FILES TO KEEP — everything else
-`.env`, `package.json`, `package-lock.json`, `vite.config.js`, `index.html`,
-`.github/`, `public/`, `src/App.jsx`, `src/main.jsx`, `src/api/api.js`,
-`src/hooks/useGraph.js`, `src/context/*`, `Logo.jsx`, `ConceptOrbit.jsx/.css`,
-`RoleSelection.jsx/.css`, `CourseJoin.jsx`, `CourseMap.jsx`,
-`ConceptNode.jsx/.css`, `Toolbar.*`, `SidePanel.*`, `AddConceptDialog.*`,
-`AnalyticsPanel.jsx`, `DeletableEdge.jsx`, `TrailEdge.jsx`, `Auth/*`. No new
-npm dependencies — everything here is plain CSS/SVG/React state.
+- **Frontend**: React 18 + Vite 5 (this repo)
+- **Routing**: React Router v7
+- **Graph canvas**: React Flow 11 + `@dagrejs/dagre` for auto-layout
+- **Auth**: email/password + Google OAuth (`@react-oauth/google`)
+- **Backend**: a separate service (not in this repo) — the frontend talks
+  to it over REST via `src/api/api.js`, configured with `VITE_API_URL`
 
----
-
-## 1. The scrolling bug — root cause & fix
-
-Your `src/styles/index.css` had:
-
-```css
-html, body, #root { height: 100%; }
-body { ...; overflow: hidden; }
-```
-
-`overflow: hidden` on `body`, combined with `height: 100%` everywhere,
-locked the *entire document* to one viewport height — so any landing-page
-content past the hero was clipped and un-scrollable, exactly what you saw.
-
-The fix:
-- `body` no longer has `overflow: hidden`. The page can scroll normally now.
-- `.app-shell` (the concept-graph editor wrapper) is now `position: fixed;
-  inset: 0; overflow: hidden;` instead of a relative 100%-height box. It's
-  now **self-contained** — it fills the viewport and clips its own content
-  (the ReactFlow canvas) regardless of whether the body scrolls, so the
-  graph editor keeps behaving exactly like before.
-- The role-selection / sign-in / course-join / dashboard screens already
-  used `.ls-shell { position: fixed; inset: 0; }`, so they were already
-  self-contained and needed no change.
-- `GraphBackground` (the landing-page knowledge-graph backdrop) switched
-  from `position: absolute` to `position: fixed`, so it now stays pinned
-  behind the content as you scroll the long landing page, instead of
-  stretching to the full page height.
-
-This is the single highest-priority fix in this batch — test it first.
-
-## 2. Landing page — new sections
-
-`LandingPage.jsx` now includes, in order:
-
-1. **Navbar** (unchanged)
-2. **Hero** (unchanged — orbit + headline)
-3. **Feature cards** (unchanged)
-4. **What is Nodemap?** — short explainer paragraph
-5. **How Nodemap works** — 4 numbered steps (Map → Learn → Identify gaps →
-   Improve) connected by an animated traveling-dot line between them
-6. **For students** — bullet list + a small animated dependency chain
-   (Arrays → Searching → Graphs → Algorithms)
-7. **For educators** — bullet list + a small "class mastery" heatmap of
-   concept chips (confident/learning/struggling color-coded)
-8. **About Nodemap** — the storytelling section: explains the "why, not
-   just completed/not-completed" idea, illustrated by a dependency chain
-   (Data Structures → Recursion → Trees → Graph Theory → Graph Algorithms)
-   with the first node marked "struggling" and everything downstream
-   marked "at risk" — a direct visual of gap propagation
-9. **Meet the creators** — contact cards for **Nawal Kishore S Pai**
-   (`nawalkishoresatishpai@gmail.com`) and **Gokul B**
-   (`gokulb7776@gmail.com`), taken exactly from your reference screenshot,
-   each a `mailto:` link with a hover-lift glass card
-10. **Footer** (unchanged)
-
-`MiniDependencyChain.jsx` is a small reusable component used in both the
-"For students" and "About" sections — a vertical chain of concept nodes
-connected by arrows. Pass it a `weakIndex` to mark a node as struggling and
-auto-flag everything below it as "at risk"; without one, it gently
-auto-cycles which node looks "active" (paused under `prefers-reduced-motion`).
-
-## 3. Concept graph page — ambient background
-
-`GraphAmbientBackground.jsx` is a new decorative layer mounted behind the
-ReactFlow canvas in `GraphCanvas.jsx`: a faint dot grid (masked so it fades
-toward the edges) plus a soft glow that drifts very slightly toward the
-mouse position (throttled with `requestAnimationFrame`, a single
-`mousemove` listener, no React re-renders). It's `pointer-events: none` and
-sits at a lower z-index than the graph, so panning/zooming/clicking nodes
-is completely unaffected. Disabled under `prefers-reduced-motion`.
-
-## 4. Node hover + selection highlighting
-
-`GraphCanvas.jsx` previously only dimmed unrelated nodes/edges when a node
-was **selected**. It now does the same thing on **hover** too (selection
-still takes priority if something is selected) — hovering a concept now
-raises it (existing CSS), highlights its direct dependencies, and dims the
-rest of the graph, exactly per your spec. This uses ReactFlow's built-in
-`onNodeMouseEnter`/`onNodeMouseLeave` props — no new dependency.
-
-## 5. Educator dashboard — course cards
-
-Course list items were inline-styled `<li>`s; they're now a `.edu-course-card`
-class with a hover lift + border glow + shadow, defined in
-`src/styles/index.css`. No behavioral change — same links, same copy-code
-button, same student count.
-
----
-
-## What I did NOT touch in this pass
-
-- Role-selection cards, course-join screen, and `ConceptOrbit` were already
-  updated in the previous batch and are untouched here.
-- Toolbar, SidePanel, AddConceptDialog, AnalyticsPanel — not touched.
-- No parallax/mouse response was added to the *landing page* background
-  (only the graph page) to avoid overloading the already-content-heavy
-  scrolling page with motion; let me know if you want that too.
-
-## Install & verify
+## Run it locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Checklist:
-- [ ] Landing page scrolls all the way to the footer, mouse wheel and
-      trackpad both work, no clipped content
-- [ ] Concept-graph editor still fills the screen with no page-level
-      scrollbar (it's a fixed, self-contained view)
-- [ ] Hovering a node in the graph dims unrelated nodes/edges
-- [ ] Creators section shows the correct names/emails and `mailto:` links open your mail client
-- [ ] Existing auth/course flows still work unchanged
+You'll need a `.env` file (not committed) with at least:
 
-Then:
+```
+VITE_API_URL=<your backend's base URL>
+VITE_GOOGLE_CLIENT_ID=<your Google OAuth client ID>
+```
+
+The app requires a real backend to be reachable at `VITE_API_URL` — there
+is no mock-data mode in the current build.
+
+### Build & preview
 
 ```bash
 npm run build
+npm run preview
 ```
 
-`vite.config.js`'s `base: '/concept-dependency-map/'` wasn't touched, so
-GitHub Pages deployment is unaffected — commit source (and `dist/` if your
-Pages workflow serves it directly instead of building on push) and push to
-`main`.
+### Deploy
+
+`vite.config.js` sets `base: '/concept-dependency-map/'` for GitHub Pages.
+Pushing to `main` triggers the workflow in `.github/workflows`, which
+builds and publishes `dist/`.
+
+## Project structure
+
+```
+src/
+├── api/api.js              # all backend calls
+├── components/
+│   ├── Auth/                # SignIn, Register
+│   ├── LandingPage.jsx      # marketing landing page
+│   ├── RoleSelection.jsx    # "Educator or Student?" onboarding
+│   ├── CourseJoin.jsx       # student dashboard: join by code + enrolled list
+│   ├── EducatorDashboard.jsx
+│   ├── CourseMap.jsx        # container for the graph view
+│   ├── GraphCanvas.jsx      # React Flow wrapper + node/edge highlighting
+│   ├── ConceptNode.jsx      # custom node renderer (160×44px)
+│   ├── SidePanel.jsx        # node detail / mastery panel
+│   ├── Toolbar.jsx          # graph toolbar
+│   ├── AnalyticsPanel.jsx   # educator class analytics
+│   └── GraphBackground.jsx, GraphAmbientBackground.jsx, ConceptOrbit.jsx
+│                             # decorative knowledge-graph backgrounds
+├── context/                  # Auth, Role, Toast providers
+├── hooks/useGraph.js         # graph state, persistence, layout, gap analysis
+└── styles/index.css          # design tokens + base component styles
+```
+
+## Roles & flow
+
+1. Visitor lands on **`/`**.
+2. Picks **Educator** or **Student** at **`/join`**.
+3. Signs in (email/password or Google) at **`/signin`** or **`/register`**.
+4. **Educator** → `/dashboard` → creates/edits courses → `/course/:id/edit`
+   (full graph editor: add concepts, connect dependencies, auto-layout).
+5. **Student** → `/student/join` → enters a course code → `/course/:id`
+   (read-only graph + mastery self-tracking + gap-risk highlighting).
+
+## Design system
+
+Dark, warm-charcoal background with a coral/orange primary accent and
+indigo/violet secondary accents. Tokens (spacing, radius, shadows, colors)
+live at the top of `src/styles/index.css`. `GraphBackground` /
+`GraphAmbientBackground` provide the knowledge-graph-style backdrop used
+consistently across every full-screen view (landing, auth, onboarding,
+dashboards, and the graph canvas itself).
+
+## Contributing
+
+Open a PR against `main`; the CI workflow builds automatically on push.
+Please don't commit `node_modules/` or `.env`.

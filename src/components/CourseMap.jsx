@@ -88,7 +88,24 @@ export default function CourseMap() {
       {graph.loading ? (
         <div className="loading-screen animate-fade-in">
           <div className="spinner" />
-          <span className="t-mono t-faint" style={{ fontSize: 12 }}>Loading map…</span>
+          <span className="t-mono t-faint" style={{ fontSize: 12 }}>Loading concept map…</span>
+        </div>
+      ) : graph.error ? (
+        <div className="loading-screen animate-fade-in gm-state">
+          <div className="gm-state-icon gm-state-icon--error">⚠</div>
+          <h3 className="gm-state-title">Unable to load the concept map</h3>
+          <p className="gm-state-desc">{graph.error}</p>
+          <button className="btn btn-primary" onClick={graph.reload}>Try again</button>
+        </div>
+      ) : graph.nodes.length === 0 ? (
+        <div className="loading-screen animate-fade-in gm-state">
+          <div className="gm-state-icon">◈</div>
+          <h3 className="gm-state-title">No concepts yet</h3>
+          <p className="gm-state-desc">
+            {isEducator
+              ? 'Double-click anywhere on the canvas to add your first concept.'
+              : "Your educator hasn't added any concepts to this course yet."}
+          </p>
         </div>
       ) : (
         <ReactFlowProvider>

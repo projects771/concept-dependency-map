@@ -4,35 +4,92 @@ import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import GraphBackground from './GraphBackground.jsx';
+import './CourseJoin.css';
+
+const ENROLLED_CACHE_KEY = 'enrolled_courses';
+
+function readCachedCourses() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(ENROLLED_CACHE_KEY) || '[]');
+    // Support both the old cache format (array of ids) and the new format
+    // (array of course objects) so we don't break on an existing cache.
+    return raw.map((entry) => (typeof entry === 'object' ? entry : { id: entry }));
+  } catch {
+    return [];
+  }
+}
+
+function writeCachedCourses(courses) {
+  try {
+    localStorage.setItem(ENROLLED_CACHE_KEY, JSON.stringify(courses));
+  } catch {
+    /* localStorage unavailable — fail silently, it's only a UI fallback */
+  }
+}
+
+function dedupeCourses(courses) {
+  const seen = new Map();
+  courses.forEach((c) => {
+    const id = c.id || c._id;
+    if (id && !seen.has(id)) seen.set(id, c);
+  });
+  return Array.from(seen.values());
+}
+
+// Turn a raw backend/network error into something safe to show a student.
+function friendlyJoinError(err) {
+  if (!err || err.status === 0) return "Can't reach the server. Check your connection and try again.";
+  if (err.status === 404) return "That course code doesn't match any course.";
+  if (err.status === 409) return "You're already enrolled in this course.";
+  if (err.status >= 500) return 'Something went wrong on our end. Please try again in a moment.';
+  return err.message && err.message.length < 100
+    ? err.message
+    : 'Invalid course code or error joining. Please double-check the code.';
+}
 
 export default function CourseJoin() {
   const [chars, setChars] = useState(['', '', '', '', '', '']);
   const refs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
   const [validating, setValidating] = useState(false);
   const [localError, setLocalError] = useState('');
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState(() => readCachedCourses());
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
-    // Fetch enrolled courses
+    // Cached courses render immediately (see useState above) so the list
+    // never looks empty for a moment; this reconciles with the server,
+    // which remains the source of truth.
     const loadCourses = async () => {
+      setCoursesLoading(true);
+      setCoursesError(false);
+      let courses = null;
       try {
-        const res = await api.fetchCourses();
-        const courses = res?.courses || [];
-        if (courses.length > 0) {
-          setEnrolledCourses(courses);
-          // Cache enrolled course IDs in localStorage as fallback
-          localStorage.setItem('enrolled_courses', JSON.stringify(courses.map(c => c.id)));
-        }
+        const res = await api.fetchEnrolledCourses();
+        courses = res?.courses || [];
       } catch (err) {
-        console.error('Error fetching courses:', err);
+        // Dedicated endpoint may not exist yet on the backend — fall back
+        // to the general courses list rather than showing nothing.
+        try {
+          const res = await api.fetchCourses();
+          courses = res?.courses || [];
+        } catch (err2) {
+          console.error('Error fetching enrolled courses:', err2);
+          setCoursesError(true);
+        }
       }
+      if (courses) {
+        const merged = dedupeCourses([...readCachedCourses(), ...courses]);
+        setEnrolledCourses(merged);
+        writeCachedCourses(merged);
+      }
+      setCoursesLoading(false);
     };
-    if (user) {
-      loadCourses();
-    }
+    if (user) loadCourses();
+    else setCoursesLoading(false);
   }, [user]);
 
   const handleChange = (index, value) => {
@@ -77,101 +134,120 @@ export default function CourseJoin() {
     const courseCode = chars.join('');
     try {
       const response = await api.joinCourse(courseCode);
-      if (response && (response.courseId || response.id || response._id)) {
+      const courseId = response?.courseId || response?.id || response?._id;
+      if (response && courseId) {
+        // Cache immediately so it shows up in "My enrolled courses" even
+        // before the next server round-trip — the join call itself already
+        // confirmed persistence server-side.
+        const cached = dedupeCourses([
+          ...readCachedCourses(),
+          { id: courseId, title: response.title || response.course?.title, courseCode },
+        ]);
+        writeCachedCourses(cached);
+        setEnrolledCourses(cached);
         toast.success('Successfully joined course!');
-        navigate(`/course/${response.courseId || response.id || response._id}`);
+        navigate(`/course/${courseId}`);
       } else {
-        setLocalError('Failed to join course.');
+        setLocalError('Failed to join course. Please try again.');
       }
     } catch (err) {
-      setLocalError(err.message || 'Invalid course code or error joining.');
+      setLocalError(friendlyJoinError(err));
     } finally {
       setValidating(false);
     }
   };
 
   return (
-    <div className="ls-shell" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: 'var(--c-bg, #111)', padding: '20px' }}>
+    <div className="ls-shell cj-shell">
       <GraphBackground />
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '480px', width: '100%', padding: '40px', backgroundColor: 'rgba(30, 30, 30, 0.75)', backdropFilter: 'blur(10px)', borderRadius: '12px', border: '1px solid var(--c-border, #333)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔗</div>
-        <h2 style={{ color: 'var(--brand-accent, #3b82f6)', fontWeight: 'bold', fontSize: '1.3rem', marginBottom: '8px', textAlign: 'center' }}>Enter your course code</h2>
-        <p style={{ color: 'var(--c-text-muted, #9ca3af)', textAlign: 'center', marginBottom: '32px', fontSize: '0.95rem' }}>Your educator shared a 6-character code to join their course map</p>
-        
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-          {chars.map((char, index) => (
-            <input
-              key={index}
-              ref={refs[index]}
-              type="text"
-              value={char}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              onPaste={handlePaste}
-              style={{
-                width: '52px',
-                height: '56px',
-                backgroundColor: 'var(--c-surface-2, #2a2a2a)',
-                border: '1px solid var(--c-border, #444)',
-                borderRadius: '8px',
-                textAlign: 'center',
-                fontSize: '22px',
-                fontWeight: '600',
-                fontFamily: 'monospace',
-                textTransform: 'uppercase',
-                color: 'var(--c-text, #fff)',
-                outline: 'none',
-                transition: 'border-color 0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--brand-accent, #3b82f6)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--c-border, #444)'}
-            />
-          ))}
-        </div>
+      <div className="cj-container">
+        <div className="ls-card cj-join-card animate-slide-up">
+          <div className="cj-icon">🔗</div>
+          <h2 className="cj-title">Enter your course code</h2>
+          <p className="cj-sub">Your educator shared a 6-character code to join their course map</p>
 
-        {localError && (
-          <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{localError}</div>
-        )}
-
-        <button
-          onClick={handleJoin}
-          disabled={!isComplete || validating}
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: isComplete ? 'var(--brand-accent, #3b82f6)' : 'var(--c-surface-2, #2a2a2a)',
-            color: isComplete ? '#fff' : 'var(--c-text-muted, #6b7280)',
-            border: 'none',
-            borderRadius: '8px',
-            fontWeight: '600',
-            fontSize: '1rem',
-            cursor: isComplete && !validating ? 'pointer' : 'not-allowed',
-            transition: 'background-color 0.2s',
-            marginTop: '8px'
-          }}
-        >
-          {validating ? 'Checking...' : 'Join course'}
-        </button>
-      </div>
-
-      {enrolledCourses.length > 0 && (
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '480px', width: '100%', marginTop: '32px' }}>
-          <h3 style={{ color: 'var(--c-text-muted, #9ca3af)', fontSize: '1rem', marginBottom: '16px', borderBottom: '1px solid var(--c-border, #333)', paddingBottom: '8px' }}>My enrolled courses</h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {enrolledCourses.map(course => (
-              <li key={course.id || course._id}>
-                <a
-                  href={`/course/${course.id || course._id}`}
-                  onClick={(e) => { e.preventDefault(); navigate(`/course/${course.id || course._id}`); }}
-                  style={{ color: 'var(--brand-accent, #3b82f6)', textDecoration: 'none', display: 'block', padding: '12px', backgroundColor: 'var(--c-surface, #1e1e1e)', borderRadius: '8px', border: '1px solid var(--c-border, #333)' }}
-                >
-                  {course.title || course.name || 'Untitled Course'}
-                </a>
-              </li>
+          <div className="cj-code-row">
+            {chars.map((char, index) => (
+              <input
+                key={index}
+                ref={refs[index]}
+                type="text"
+                value={char}
+                className="cj-code-input"
+                onChange={(e) => handleChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={handlePaste}
+              />
             ))}
-          </ul>
+          </div>
+
+          {localError && <div className="cj-error">{localError}</div>}
+
+          <button
+            onClick={handleJoin}
+            disabled={!isComplete || validating}
+            className="btn btn-primary cj-join-btn"
+          >
+            {validating ? 'Checking…' : 'Join course'}
+          </button>
         </div>
-      )}
+
+        <div className="cj-enrolled">
+          <h3 className="cj-enrolled-title">My enrolled courses</h3>
+
+          {coursesLoading && enrolledCourses.length === 0 ? (
+            <div className="cj-skeleton-list">
+              {[0, 1].map((i) => <div key={i} className="cj-skeleton-card" />)}
+            </div>
+          ) : enrolledCourses.length > 0 ? (
+            <>
+              <ul className="cj-course-list">
+                {enrolledCourses.map(course => {
+                  const id = course.id || course._id;
+                  return (
+                    <li key={id}>
+                      <a
+                        href={`/course/${id}`}
+                        onClick={(e) => { e.preventDefault(); navigate(`/course/${id}`); }}
+                        className="cj-course-card"
+                      >
+                        <div className="cj-course-card-main">
+                          <div className="cj-course-card-title">{course.title || course.name || 'Untitled course'}</div>
+                          {course.description && <div className="cj-course-card-desc">{course.description}</div>}
+                          <div className="cj-course-card-meta">
+                            {course.courseCode && <span className="cj-course-code t-mono">{course.courseCode}</span>}
+                            {typeof course.conceptCount === 'number' && (
+                              <span className="t-faint">{course.conceptCount} concept{course.conceptCount !== 1 ? 's' : ''}</span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="cj-course-card-cta">Open course →</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+              {coursesError && (
+                <div className="cj-inline-warning">
+                  Showing your last known courses — couldn't reach the server to refresh this list.
+                </div>
+              )}
+            </>
+          ) : coursesError ? (
+            <div className="cj-empty cj-empty--error">
+              <div className="cj-empty-icon">⚠</div>
+              <div className="cj-empty-title">Couldn't load your courses</div>
+              <div className="cj-empty-sub">Check your connection and refresh the page to try again.</div>
+            </div>
+          ) : (
+            <div className="cj-empty">
+              <div className="cj-empty-icon">◈</div>
+              <div className="cj-empty-title">No courses yet</div>
+              <div className="cj-empty-sub">Join a course using your course code above to start learning.</div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

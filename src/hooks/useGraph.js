@@ -69,7 +69,11 @@ export function useGraph(courseId, toast) {
   const [nodes,        setNodes]        = useState([]);
   const [edges,        setEdges]        = useState([]);
   const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState(null);
+  const [reloadTick,   setReloadTick]   = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
+
+  const reload = useCallback(() => setReloadTick((t) => t + 1), []);
 
   const withPending = useCallback(async (fn) => {
     setPendingCount((c) => c + 1);
@@ -83,6 +87,7 @@ export function useGraph(courseId, toast) {
     let alive = true;
     (async () => {
       setLoading(true);
+      setError(null);
       try {
         const [conceptsRes, masteryRes] = await Promise.allSettled([
           api.fetchConcepts(courseId),
@@ -117,13 +122,16 @@ export function useGraph(courseId, toast) {
         setNodes(loadedNodes);
         setEdges(loadedEdges);
       } catch (e) {
-        if (alive) toast?.error(`Failed to load course: ${e.message}`);
+        if (alive) {
+          setError(e.message || 'Something went wrong loading this course.');
+          toast?.error(`Failed to load course: ${e.message}`);
+        }
       } finally {
         if (alive) setLoading(false);
       }
     })();
     return () => { alive = false; };
-  }, [courseId]);
+  }, [courseId, reloadTick]);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
@@ -260,7 +268,7 @@ export function useGraph(courseId, toast) {
 
   return {
     course,
-    nodes, edges, loading,
+    nodes, edges, loading, error, reload,
     saving: pendingCount > 0,
     setNodes, setEdges,
     onNodesChange, onEdgesChange,

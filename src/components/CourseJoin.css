@@ -1,0 +1,212 @@
+.cj-shell {
+  overflow-y: auto;
+  padding: 40px 20px;
+  display: block;
+}
+
+.cj-container {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.cj-join-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cj-icon { font-size: 40px; margin-bottom: 16px; }
+
+.cj-title {
+  color: var(--brand-light);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.cj-sub {
+  color: var(--c-text-2);
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cj-code-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.cj-code-input {
+  width: 48px;
+  height: 56px;
+  background: var(--c-surface-2);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: var(--c-text);
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.cj-code-input:focus {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-glow);
+}
+
+.cj-error {
+  color: var(--c-struggling);
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.cj-join-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.cj-enrolled {
+  width: 100%;
+}
+
+.cj-enrolled-title {
+  color: var(--c-text-2);
+  font-size: 1rem;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.cj-course-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cj-course-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(160deg, rgba(41,37,36,0.9), rgba(41,37,36,0.6));
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+
+.cj-course-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(213,107,74,0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.cj-course-card-main { min-width: 0; }
+
+.cj-course-card-title {
+  color: var(--c-text);
+  font-weight: 600;
+  font-size: 0.98rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cj-course-card-desc {
+  color: var(--c-text-3);
+  font-size: 0.83rem;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cj-course-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+}
+
+.cj-course-code {
+  color: var(--brand-light);
+  background: var(--c-accent-glow);
+  padding: 1px 7px;
+  border-radius: var(--r-full);
+}
+
+.cj-course-card-cta {
+  flex-shrink: 0;
+  color: var(--brand-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* loading skeleton */
+.cj-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cj-skeleton-card {
+  height: 64px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-border);
+  background: linear-gradient(90deg, var(--c-surface-2) 25%, var(--c-surface-3) 37%, var(--c-surface-2) 63%);
+  background-size: 400% 100%;
+  animation: cj-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes cj-shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* empty / error states */
+.cj-empty {
+  text-align: center;
+  padding: 32px 20px;
+  border: 1px dashed var(--c-border-2);
+  border-radius: var(--r-lg);
+}
+
+.cj-empty--error { border-color: rgba(248,113,113,0.35); }
+
+.cj-empty-icon { font-size: 22px; color: var(--brand-light); margin-bottom: 8px; }
+.cj-empty--error .cj-empty-icon { color: var(--c-struggling); }
+.cj-empty-title { color: var(--c-text); font-weight: 600; margin-bottom: 4px; }
+.cj-empty-sub { color: var(--c-text-3); font-size: 0.85rem; }
+
+.cj-inline-warning {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--c-learning);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cj-course-card, .cj-code-input, .cj-skeleton-card { transition: none; animation: none; }
+}
