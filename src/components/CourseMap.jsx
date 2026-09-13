@@ -16,7 +16,15 @@ export default function CourseMap() {
   const navigate = useNavigate();
   const toast = useToast();
   const { user } = useAuth();
-  const role = user?.role || 'student';
+  // CourseMap only ever renders inside <ProtectedRoute allowedRole="educator|student">
+  // (see App.jsx), which already guarantees user.role matches the route
+  // that got us here. Reading it directly (instead of `user?.role || 'student'`)
+  // means a real auth bug fails loudly instead of silently mislabeling
+  // an educator as a student.
+  const role = user.role;
+  if (import.meta.env.DEV && role !== 'educator' && role !== 'student') {
+    console.error(`CourseMap rendered with unexpected role "${role}" for user`, user);
+  }
   const { setRole: setCtxRole } = useRole();
 
   useEffect(() => {

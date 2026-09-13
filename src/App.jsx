@@ -16,7 +16,14 @@ function ProtectedRoute({ allowedRole }) {
   if (loading) return null; // Wait for initial auth check
   if (!user) return <Navigate to="/join" replace />;
   if (allowedRole && user.role !== allowedRole) {
-    return <Navigate to={user.role === 'educator' ? '/dashboard' : '/student/join'} replace />;
+    // Don't guess a role here — if this account's role doesn't match what
+    // this route requires, send them back to explicitly choose rather than
+    // silently assuming "student" (that assumption is exactly what was
+    // masking the role bug elsewhere in the app).
+    if (user.role === 'educator') return <Navigate to="/dashboard" replace />;
+    if (user.role === 'student') return <Navigate to="/student/join" replace />;
+    console.warn(`Authenticated user has no recognized role ("${user.role}") — sending to role selection.`);
+    return <Navigate to="/join" replace />;
   }
   return <Outlet />;
 }

@@ -24,15 +24,34 @@ const getLayoutedElements = (nodes, edges) => {
   };
 };
 
-function needsLayout(nodes) {
+function needsLayout(nodes, edges = []) {
   if (nodes.length === 0) return false;
   if (nodes.every(n => n.position.x === 0 && n.position.y === 0)) return true;
+
   const posSet = new Set();
   for (const n of nodes) {
     const key = `${n.position.x},${n.position.y}`;
     if (posSet.has(key)) return true;
     posSet.add(key);
   }
+
+  // A prerequisite must render ABOVE its dependent (top-to-bottom flow —
+  // see ConceptNode's handles: source is on the bottom, target is on the
+  // top). If any stored position has the source at or below its target,
+  // the geometry contradicts the arrow direction and React Flow renders a
+  // nonsensical/disconnected-looking edge (this was the floating purple
+  // arrow between "Recursion" and "Loop") — force a relayout to fix it.
+  if (edges.length > 0) {
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    for (const e of edges) {
+      const source = byId.get(e.source);
+      const target = byId.get(e.target);
+      if (source && target && source.position.y >= target.position.y) {
+        return true;
+      }
+    }
+  }
+
   return false;
 }
 
@@ -113,7 +132,7 @@ export function useGraph(courseId, toast) {
           validNodeIds.has(e.source) && validNodeIds.has(e.target)
         );
         
-        if (needsLayout(loadedNodes)) {
+        if (needsLayout(loadedNodes, loadedEdges)) {
           const layouted = getLayoutedElements(loadedNodes, loadedEdges);
           loadedNodes = layouted.nodes;
         }
