@@ -55,7 +55,7 @@ export default function EducatorDashboard() {
   return (
     <div className="ls-shell">
       <GraphBackground />
-      <div className="ls-card animate-slide-up" style={{ minWidth: 600, position: 'relative', zIndex: 1 }}>
+      <div className="ls-card ls-card--wide animate-slide-up" style={{ position: 'relative', zIndex: 1 }}>
         <div className="ls-course-header">
           <div>
             <Logo />
@@ -130,7 +130,7 @@ export default function EducatorDashboard() {
             </div>
           </form>
         ) : (
-          <button className="btn btn-secondary" style={{ alignSelf: 'flex-start' }} onClick={() => setShowForm(true)}>
+          <button className="btn btn-secondary" style={{ alignSelf: 'center' }} onClick={() => setShowForm(true)}>
             + New course
           </button>
         )}
