@@ -4,6 +4,7 @@ import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import GraphBackground from './GraphBackground.jsx';
+import CourseCarousel from './CourseCarousel.jsx';
 import './CourseJoin.css';
 
 const ENROLLED_CACHE_KEY = 'enrolled_courses';
@@ -201,32 +202,19 @@ export default function CourseJoin() {
             </div>
           ) : enrolledCourses.length > 0 ? (
             <>
-              <ul className="cj-course-list">
-                {enrolledCourses.map(course => {
-                  const id = course.id || course._id;
-                  return (
-                    <li key={id}>
-                      <a
-                        href={`/course/${id}`}
-                        onClick={(e) => { e.preventDefault(); navigate(`/course/${id}`); }}
-                        className="cj-course-card"
-                      >
-                        <div className="cj-course-card-main">
-                          <div className="cj-course-card-title">{course.title || course.name || 'Untitled course'}</div>
-                          {course.description && <div className="cj-course-card-desc">{course.description}</div>}
-                          <div className="cj-course-card-meta">
-                            {course.courseCode && <span className="cj-course-code t-mono">{course.courseCode}</span>}
-                            {typeof course.conceptCount === 'number' && (
-                              <span className="t-faint">{course.conceptCount} concept{course.conceptCount !== 1 ? 's' : ''}</span>
-                            )}
-                          </div>
-                        </div>
-                        <span className="cj-course-card-cta">Open course →</span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
+              <CourseCarousel
+                courses={enrolledCourses}
+                actionLabel="Open course →"
+                onOpen={(course) => navigate(`/course/${course.id || course._id}`)}
+                renderMeta={(course) => (
+                  <>
+                    {course.courseCode && <span className="cj-course-code t-mono">{course.courseCode}</span>}
+                    {typeof course.conceptCount === 'number' && (
+                      <span>{course.conceptCount} concept{course.conceptCount !== 1 ? 's' : ''}</span>
+                    )}
+                  </>
+                )}
+              />
               {coursesError && (
                 <div className="cj-inline-warning">
                   Showing your last known courses — couldn't reach the server to refresh this list.

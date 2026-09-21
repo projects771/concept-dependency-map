@@ -1,0 +1,221 @@
+.cc {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.cc-viewport {
+  width: 100%;
+  outline: none;
+  border-radius: var(--r-lg);
+}
+
+.cc-viewport:focus-visible {
+  box-shadow: 0 0 0 2px var(--brand-accent);
+}
+
+.cc-stage {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* Each card is centered, then pushed out along X by its offset from the
+   focused card, scaled down and rotated slightly for depth. */
+.cc-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 290px;
+  height: 100%;
+  margin-left: -145px;
+  transform:
+    translateX(calc(var(--offset) * 165px))
+    scale(calc(1 - var(--abs) * 0.12))
+    rotateY(calc(var(--offset) * -14deg));
+  opacity: calc(1 - var(--abs) * 0.35);
+  transition:
+    transform 420ms var(--ease),
+    opacity 420ms var(--ease);
+  will-change: transform, opacity;
+}
+
+.cc-card--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cc-card-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, rgba(41,37,36,0.95), rgba(41,37,36,0.65));
+  border: 1px solid var(--c-border);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    background var(--t-base) var(--ease);
+}
+
+.cc-card--active .cc-card-inner {
+  border-color: rgba(213,107,74,0.5);
+  box-shadow: var(--shadow-lg), 0 0 32px var(--c-accent-glow);
+  background: linear-gradient(160deg, rgba(48,41,38,0.97), rgba(41,37,36,0.75));
+}
+
+.cc-card-inner:hover {
+  border-color: rgba(213,107,74,0.45);
+}
+
+.cc-card-inner:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand-accent), var(--shadow-lg);
+}
+
+.cc-card-glyph {
+  font-size: 18px;
+  color: var(--brand-light);
+  opacity: 0.85;
+}
+
+.cc-card-title {
+  color: var(--c-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cc-card-desc {
+  color: var(--c-text-3);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cc-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.76rem;
+  color: var(--c-text-3);
+  margin-top: 2px;
+}
+
+.cc-card-action {
+  margin-top: auto;
+  color: var(--brand-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ── controls ─────────────────────────────────────────────── */
+.cc-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cc-nav {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-2);
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.cc-nav:hover:not(:disabled) {
+  border-color: rgba(213,107,74,0.5);
+  color: var(--brand-light);
+}
+
+.cc-nav:disabled { opacity: 0.35; cursor: default; }
+
+.cc-dots { display: flex; align-items: center; gap: 7px; }
+
+.cc-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--c-border-2);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.cc-dot--active {
+  background: var(--brand-accent);
+  transform: scale(1.4);
+}
+
+.cc-counter {
+  font-size: 11px;
+  color: var(--c-text-3);
+  letter-spacing: 0.06em;
+}
+
+/* ── responsive ───────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .cc-stage { height: 200px; }
+  .cc-card {
+    width: 240px;
+    margin-left: -120px;
+    transform:
+      translateX(calc(var(--offset) * 120px))
+      scale(calc(1 - var(--abs) * 0.14))
+      rotateY(calc(var(--offset) * -12deg));
+  }
+}
+
+@media (max-width: 460px) {
+  .cc-card {
+    width: 220px;
+    margin-left: -110px;
+    /* Flatter offsets on very small screens so the focused card stays
+       fully readable and nothing runs off the edge. */
+    transform:
+      translateX(calc(var(--offset) * 74px))
+      scale(calc(1 - var(--abs) * 0.18))
+      rotateY(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-card {
+    transition: none;
+    /* No 3D rotation and no scale ramp — position only, so switching
+       courses is an instant, flat change rather than a motion effect. */
+    transform: translateX(calc(var(--offset) * 165px));
+  }
+  .cc-card-inner, .cc-nav, .cc-dot { transition: none; }
+  .cc-card:not(.cc-card--active) { opacity: 0.5; }
+}

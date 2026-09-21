@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import Logo from './Logo.jsx';
 import GraphBackground from './GraphBackground.jsx';
+import CourseCarousel from './CourseCarousel.jsx';
 
 export default function EducatorDashboard() {
   const { user, logout } = useAuth();
@@ -75,30 +76,37 @@ export default function EducatorDashboard() {
             <div className="ls-skeleton-item"><div className="skeleton" style={{ width: '55%', height: 15 }} /></div>
           </div>
         ) : courses.length > 0 ? (
-          <ul className="ls-course-list">
-            {courses.map(course => (
-              <li key={course.id} className="edu-course-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div className="ls-course-title" style={{ fontSize: 16 }}>{course.title}</div>
-                    {course.description && <div className="ls-course-desc">{course.description}</div>}
-                  </div>
-                  <Link to={`/course/${course.id}/edit`} className="btn btn-primary btn-sm">Edit Graph →</Link>
+          <>
+            <CourseCarousel
+              courses={courses}
+              actionLabel="Edit Graph →"
+              onOpen={(course) => navigate(`/course/${course.id}/edit`)}
+              renderMeta={(course) => (
+                <>
+                  <span>{course.courseCode}</span>
+                  <span>
+                    {course.studentCount || 0} student{(course.studentCount !== 1) ? 's' : ''} enrolled
+                  </span>
+                </>
+              )}
+            />
+            {/* Share-code copying stays outside the carousel: putting a
+                second button inside a card would make the whole card's
+                click target ambiguous. */}
+            <div className="edu-share-row">
+              {courses.map(course => (
+                <div key={course.id} className="edu-share-item">
+                  <span className="t-faint">{course.title} share code: </span>
+                  <code className="t-mono edu-share-code">{course.courseCode}</code>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    style={{ padding: '2px 6px', marginLeft: 6, height: 'auto', fontSize: 12 }}
+                    onClick={() => copyCode(course.courseCode)}
+                  >Copy</button>
                 </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, borderTop: '1px solid var(--c-border)', paddingTop: 12, marginTop: 4 }}>
-                  <div style={{ fontSize: 13 }}>
-                    <span className="t-faint">Share code: </span>
-                    <code className="t-mono" style={{ background: 'var(--c-surface)', padding: '2px 6px', borderRadius: 4, color: 'var(--c-accent)' }}>{course.courseCode}</code>
-                    <button className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', marginLeft: 8, height: 'auto', fontSize: 12 }} onClick={() => copyCode(course.courseCode)}>Copy</button>
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--c-faint)' }}>
-                    • {course.studentCount || 0} student{(course.studentCount !== 1) ? 's' : ''} enrolled
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="ls-empty">
             <div className="ls-empty-icon">◈</div>

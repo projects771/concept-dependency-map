@@ -292,6 +292,29 @@ textarea.input { resize: vertical; line-height: 1.5; }
   .edu-course-card { transition: none; }
 }
 
+/* share codes listed under the educator's course carousel */
+.edu-share-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+
+.edu-share-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.edu-share-code {
+  background: var(--c-surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--c-accent);
+}
+
 /* ── Loading screen ────────────────────────────────────────── */
 .loading-screen {
   position: absolute;
