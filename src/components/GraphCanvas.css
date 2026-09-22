@@ -66,9 +66,10 @@
   filter: drop-shadow(0 0 6px var(--c-accent-glow));
 }
 
-/* student mode handles hidden */
+/* student mode handles hidden — MUST NOT use display:none or React Flow cannot calculate handle bounds */
 .student-mode .react-flow__handle {
-  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* ── controls ── */

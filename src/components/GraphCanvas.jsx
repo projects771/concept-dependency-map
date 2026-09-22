@@ -58,16 +58,26 @@ export default function GraphCanvas({
   }, [nodes, connected, focusNodeId]);
 
   const displayEdges = useMemo(() => {
-    if (!connected) return edges;
     return edges.map((e) => {
-      const isRelated = connected.edgeIds.has(e.id);
+      const isRelated = connected ? connected.edgeIds.has(e.id) : false;
       return {
         ...e,
-        className: [e.className, isRelated ? 'edge-highlighted' : 'edge-dimmed'].filter(Boolean).join(' '),
-        animated: isRelated ? true : e.animated,
+        type: isEducator ? 'deletable' : 'smoothstep',
+        style: { stroke: 'rgba(108,99,255,0.6)', strokeWidth: 1.5 },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: 'rgba(108,99,255,0.6)',
+          width: 16,
+          height: 16,
+        },
+        className: [
+          e.className,
+          isRelated ? 'edge-highlighted' : (connected ? 'edge-dimmed' : ''),
+        ].filter(Boolean).join(' '),
+        animated: isRelated ? true : (e.animated ?? false),
       };
     });
-  }, [edges, connected]);
+  }, [edges, connected, isEducator]);
 
   const handlePaneDoubleClick = useCallback((event) => {
     if (!isEducator || !onRequestAddConcept) return;
@@ -119,7 +129,7 @@ export default function GraphCanvas({
         minZoom={0.25}
         maxZoom={1.8}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
+        fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
       >
         <Controls position="bottom-left" showInteractive={false} />
         <MiniMap

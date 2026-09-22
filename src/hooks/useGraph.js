@@ -80,7 +80,11 @@ function toFlowNode(concept, masteryMap = {}) {
 function toFlowEdge(edge) {
   const source = String(edge.from   ?? edge.source);
   const target = String(edge.to     ?? edge.target);
-  return { id: edge.id ?? `e${source}-${target}`, source, target };
+  return {
+    id: edge.id ?? `e${source}-${target}`,
+    source,
+    target,
+  };
 }
 
 export function useGraph(courseId, toast) {
