@@ -2,9 +2,9 @@ import React from 'react';
 import './SidePanel.css';
 
 const MASTERY_OPTIONS = [
-  { value: 'learning',   label: 'Learning',   icon: '◐', color: 'var(--c-learning)',   bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.3)'  },
-  { value: 'confident',  label: 'Confident',  icon: '●', color: 'var(--c-confident)',  bg: 'rgba(52,211,153,0.08)',  border: 'rgba(52,211,153,0.3)'  },
-  { value: 'struggling', label: 'Struggling', icon: '○', color: 'var(--c-struggling)', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.3)' },
+  { value: 'learning',   label: 'Learning',   icon: '◐', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)' },
+  { value: 'confident',  label: 'Confident',  icon: '●', color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.3)' },
+  { value: 'struggling', label: 'Struggling', icon: '○', color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)' },
 ];
 
 const RISK_COLOR = {
@@ -111,17 +111,25 @@ function DependenciesList({ node, nodes, edges }) {
   if (requires.length === 0 && unlocks.length === 0) return null;
 
   return (
-    <section className="sp-section" style={{ marginTop: 24, marginBottom: 24 }}>
+    <section className="sp-section" style={{ marginTop: 20, marginBottom: 20 }}>
       {requires.length > 0 && (
-        <div style={{ marginBottom: 12 }}>
-          <div className="sp-section-label t-label t-faint">Requires</div>
-          <div style={{ fontSize: 13, color: 'var(--c-text-2)' }}>{requires.join(', ')}</div>
+        <div style={{ marginBottom: 14 }}>
+          <div className="sp-section-label">Requires</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {requires.map((req, i) => (
+              <span key={i} className="sp-dep-pill">{req}</span>
+            ))}
+          </div>
         </div>
       )}
       {unlocks.length > 0 && (
         <div>
-          <div className="sp-section-label t-label t-faint">Unlocks</div>
-          <div style={{ fontSize: 13, color: 'var(--c-text-2)' }}>{unlocks.join(', ')}</div>
+          <div className="sp-section-label">Unlocks</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {unlocks.map((unl, i) => (
+              <span key={i} className="sp-dep-pill">{unl}</span>
+            ))}
+          </div>
         </div>
       )}
     </section>

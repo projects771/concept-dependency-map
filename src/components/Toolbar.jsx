@@ -33,7 +33,7 @@ export default function Toolbar({ role, course, onAddConcept, onBackToCourses, s
       </div>
 
       {/* center: role badge (locked — not a toggle) */}
-      <div className="tb-role-badge" style={{ '--role-color': roleConf.color }}>
+      <div className={`tb-role-badge ${isEducator ? 'tb-role-badge--educator' : 'tb-role-badge--student'}`}>
         <span className="tb-role-icon">{roleConf.icon}</span>
         <span className="tb-role-label">{roleConf.label}</span>
       </div>
@@ -42,42 +42,20 @@ export default function Toolbar({ role, course, onAddConcept, onBackToCourses, s
       <div className="tb-right">
         {isEducator ? (
           <>
-            <button className="btn btn-secondary btn-sm" onClick={onRelayout} title="Auto-layout concepts top-to-bottom">
-              <span style={{ fontSize: 14 }}>▦</span> Auto-layout
+            <button className="tb-btn-layout" onClick={onRelayout} title="Auto-layout concepts top-to-bottom">
+              <span style={{ fontSize: 13 }}>▦</span> Auto-layout
             </button>
-            <button className="btn btn-primary btn-sm" onClick={onAddConcept}>
+            <button className="tb-btn-add" onClick={onAddConcept}>
               + Add concept
             </button>
             {course?.courseCode && (
-              <div style={{
-                marginLeft: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 8,
-                padding: '4px 10px',
-                fontSize: 12,
-              }}>
-                <span style={{ color: '#9ca3af' }}>Join code:</span>
-                <span style={{
-                  fontFamily: 'monospace',
-                  fontWeight: 700,
-                  fontSize: 13,
-                  color: '#e8e9f0',
-                  letterSpacing: 2,
-                }}>{course.courseCode}</span>
+              <div className="tb-code-pill">
+                <span>Join code:</span>
+                <span style={{ fontWeight: 700, color: '#ffffff' }}>{course.courseCode}</span>
                 <button
                   onClick={handleCopy}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: copied ? '#22c55e' : '#9ca3af',
-                    fontSize: 12,
-                    padding: '2px 4px',
-                  }}
+                  className={`tb-code-copy-btn ${copied ? 'tb-code-copy-btn--copied' : ''}`}
+                  title="Copy join code"
                 >
                   {copied ? '✓ Copied!' : '⧉ Copy'}
                 </button>

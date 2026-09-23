@@ -62,7 +62,7 @@
   font-weight: 600;
   padding: 3px 10px;
   border-radius: var(--r-full);
-  border: 1px solid rgba(124,106,247,0.3);
+  border: 1px solid rgba(255,255,255,0.14);
 }
 
 /* ── role selection ── */
@@ -88,9 +88,9 @@
 }
 
 .ls-role-btn:hover {
-  border-color: var(--c-accent);
-  background: rgba(124,106,247,0.06);
-  box-shadow: 0 0 0 1px var(--c-accent), 0 0 20px var(--c-accent-glow);
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
   transform: translateY(-1px);
 }
 
@@ -336,7 +336,7 @@
 /* ── Role pill variants ── */
 .ls-role-pill--educator {
   background: var(--c-accent-glow);
-  border-color: rgba(124,106,247,0.3);
+  border-color: rgba(255,255,255,0.14);
   color: var(--c-accent);
 }
 

@@ -24,8 +24,8 @@
   gap: 10px;
   padding: 10px 16px;
   border-radius: var(--r-md);
-  background: rgba(41, 37, 36, 0.75);
-  border: 1px solid var(--c-border);
+  background: #111111;
+  border: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(6px);
   min-width: 170px;
   transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), transform var(--t-base) var(--ease);
@@ -74,13 +74,13 @@
 .mdc-node--risk .mdc-node-dot { background: var(--c-struggling); }
 
 .mdc-node--active {
-  border-color: rgba(213,107,74,0.5);
-  box-shadow: 0 0 20px var(--c-accent-glow);
+  border-color: rgba(255,255,255,0.25);
+  box-shadow: 0 0 16px rgba(255,255,255,0.08);
   transform: translateX(2px);
 }
 .mdc-node--active .mdc-node-dot {
-  background: var(--brand-light);
-  box-shadow: 0 0 8px var(--brand-light);
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
 }
 
 @media (prefers-reduced-motion: reduce) {

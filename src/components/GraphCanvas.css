@@ -61,9 +61,9 @@
 
 .react-flow__edge.edge-highlighted .react-flow__edge-path {
   opacity: 1;
-  stroke: var(--brand-accent) !important;
+  stroke: #ffffff !important;
   stroke-width: 2px !important;
-  filter: drop-shadow(0 0 6px var(--c-accent-glow));
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
 }
 
 /* student mode handles hidden — MUST NOT use display:none or React Flow cannot calculate handle bounds */
@@ -76,36 +76,36 @@
 .react-flow__controls {
   border-radius: var(--r-md);
   overflow: hidden;
-  border: 1px solid var(--c-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: var(--shadow-md);
 }
 
 .react-flow__controls-button {
-  background: var(--c-surface-2) !important;
-  border-bottom: 1px solid var(--c-border) !important;
-  fill: var(--c-text-2) !important;
+  background: #1a1a1a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  fill: #aaaaaa !important;
 }
 .react-flow__controls-button:hover {
-  background: var(--c-surface-3) !important;
-  fill: var(--c-text) !important;
+  background: #222222 !important;
+  fill: #ffffff !important;
 }
 
 /* ── minimap ── */
 .react-flow__minimap {
-  background: var(--c-surface) !important;
-  border: 1px solid var(--c-border) !important;
+  background: #111111 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   border-radius: var(--r-md) !important;
   box-shadow: var(--shadow-md) !important;
 }
 
 .react-flow__minimap-mask {
-  fill: rgba(10,10,11,0.7) !important;
+  fill: rgba(10, 10, 11, 0.75) !important;
 }
 
 /* ── selection ── */
 .react-flow__selection {
-  background: rgba(124,106,247,0.08) !important;
-  border: 1px dashed var(--c-accent) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.3) !important;
 }
 
 .react-flow__attribution { display: none; }
@@ -116,12 +116,12 @@
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(17,17,19,0.8);
-  border: 1px solid var(--c-border);
+  background: rgba(17, 17, 17, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--r-full);
   padding: 6px 14px;
   font-size: 11px;
-  color: var(--c-text-3);
+  color: #aaaaaa;
   pointer-events: none;
   backdrop-filter: blur(8px);
   white-space: nowrap;

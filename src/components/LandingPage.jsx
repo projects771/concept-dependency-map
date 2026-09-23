@@ -99,10 +99,10 @@ export default function LandingPage() {
           </p>
 
           <div className="lp-cta-row">
-            <Link to="/join?role=educator" className="btn btn-primary lp-cta">
+            <Link to="/join?role=educator" className="lp-cta-educator">
               <span>◈</span> I'm an educator
             </Link>
-            <Link to="/join?role=student" className="btn btn-secondary lp-cta">
+            <Link to="/join?role=student" className="lp-cta-student">
               <span>◎</span> I'm a student
             </Link>
           </div>

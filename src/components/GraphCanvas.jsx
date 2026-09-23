@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow, MarkerType } from 'reactflow';
+import ReactFlow, { Controls, MiniMap, SelectionMode, useReactFlow, MarkerType, Background } from 'reactflow';
 import ConceptNode from './ConceptNode.jsx';
 import DeletableEdge from './DeletableEdge.jsx';
 import GraphAmbientBackground from './GraphAmbientBackground.jsx';
@@ -132,6 +132,7 @@ export default function GraphCanvas({
         fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
       >
         <Controls position="bottom-left" showInteractive={false} />
+        <Background color="rgba(255,255,255,0.035)" gap={24} size={1} />
         <MiniMap
           position="bottom-right"
           pannable

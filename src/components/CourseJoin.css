@@ -26,14 +26,14 @@
 .cj-icon { font-size: 40px; margin-bottom: 16px; }
 
 .cj-title {
-  color: var(--brand-light);
-  font-weight: 700;
+  color: #ffffff;
+  font-weight: 600;
   font-size: 1.3rem;
   margin-bottom: 8px;
 }
 
 .cj-sub {
-  color: var(--c-text-2);
+  color: #aaaaaa;
   margin-bottom: 32px;
   font-size: 0.95rem;
   line-height: 1.5;
@@ -46,40 +46,70 @@
 }
 
 .cj-code-input {
-  width: 48px;
-  height: 56px;
-  background: var(--c-surface-2);
-  border: 1.5px solid var(--c-border);
-  border-radius: var(--r-md);
-  text-align: center;
-  font-size: 22px;
+  width: 44px;
+  height: 52px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 20px;
   font-weight: 600;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  color: var(--c-text);
+  font-family: monospace;
+  text-align: center;
+  letter-spacing: 2px;
   outline: none;
-  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .cj-code-input:focus {
-  border-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px var(--c-accent-glow);
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.06);
 }
 
-.cj-error {
-  color: var(--c-struggling);
-  background: rgba(248,113,113,0.1);
-  border: 1px solid rgba(248,113,113,0.25);
-  border-radius: var(--r-md);
+.cj-code-input:not(:placeholder-shown) {
+  border-color: rgba(255,255,255,0.3);
+  color: #ffffff;
+}
+
+.cj-success-banner {
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 8px;
+  color: #22c55e;
   padding: 10px 14px;
+  font-size: 13px;
   margin-bottom: 16px;
-  font-size: 0.85rem;
+  width: 100%;
   text-align: center;
 }
 
-.cj-join-btn {
+.cj-error {
+  color: #ef4444;
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  text-align: center;
   width: 100%;
-  margin-top: 8px;
+}
+
+.cj-join-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cj-join-btn:hover {
+  background: #e0e0e0;
 }
 
 .cj-enrolled {
@@ -87,11 +117,12 @@
 }
 
 .cj-enrolled-title {
-  color: var(--c-text-2);
-  font-size: 1rem;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--c-border);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .cj-course-list {
@@ -106,35 +137,34 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px;
-  background: linear-gradient(160deg, rgba(41,37,36,0.9), rgba(41,37,36,0.6));
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-md);
+  padding: 18px 20px;
+  background: #111111;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
   text-decoration: none;
-  backdrop-filter: blur(6px);
-  transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .cj-course-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(213,107,74,0.4);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(255,255,255,0.14);
+  background: #141414;
 }
 
 .cj-course-card-main { min-width: 0; }
 
 .cj-course-card-title {
-  color: var(--c-text);
+  color: #ffffff;
   font-weight: 600;
-  font-size: 0.98rem;
+  font-size: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .cj-course-card-desc {
-  color: var(--c-text-3);
-  font-size: 0.83rem;
+  color: #555555;
+  font-size: 0.85rem;
   margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -146,20 +176,24 @@
   align-items: center;
   gap: 10px;
   margin-top: 6px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
 .cj-course-code {
-  color: var(--brand-light);
-  background: var(--c-accent-glow);
-  padding: 1px 7px;
-  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #aaaaaa;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 2px 8px;
+  letter-spacing: 2px;
 }
 
 .cj-course-card-cta {
   flex-shrink: 0;
-  color: var(--brand-light);
-  font-size: 0.85rem;
+  color: #ffffff;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -173,9 +207,9 @@
 
 .cj-skeleton-card {
   height: 64px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--c-border);
-  background: linear-gradient(90deg, var(--c-surface-2) 25%, var(--c-surface-3) 37%, var(--c-surface-2) 63%);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(90deg, #111111 25%, #1a1a1a 37%, #111111 63%);
   background-size: 400% 100%;
   animation: cj-shimmer 1.6s ease-in-out infinite;
 }
@@ -189,21 +223,21 @@
 .cj-empty {
   text-align: center;
   padding: 32px 20px;
-  border: 1px dashed var(--c-border-2);
-  border-radius: var(--r-lg);
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 12px;
 }
 
-.cj-empty--error { border-color: rgba(248,113,113,0.35); }
+.cj-empty--error { border-color: rgba(239,68,68,0.35); }
 
-.cj-empty-icon { font-size: 22px; color: var(--brand-light); margin-bottom: 8px; }
-.cj-empty--error .cj-empty-icon { color: var(--c-struggling); }
-.cj-empty-title { color: var(--c-text); font-weight: 600; margin-bottom: 4px; }
-.cj-empty-sub { color: var(--c-text-3); font-size: 0.85rem; }
+.cj-empty-icon { font-size: 22px; color: #555555; margin-bottom: 8px; }
+.cj-empty--error .cj-empty-icon { color: #ef4444; }
+.cj-empty-title { color: #ffffff; font-weight: 600; margin-bottom: 4px; }
+.cj-empty-sub { color: #555555; font-size: 0.85rem; }
 
 .cj-inline-warning {
   margin-top: 12px;
-  font-size: 0.78rem;
-  color: var(--c-learning);
+  font-size: 0.8rem;
+  color: #f59e0b;
   text-align: center;
 }
 

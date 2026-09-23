@@ -13,23 +13,23 @@
 }
 
 .gbg-edge {
-  stroke: var(--c-border-2);
+  stroke: rgba(255, 255, 255, 0.06);
   stroke-width: 1;
   fill: none;
-  opacity: 0.5;
+  opacity: 1;
 }
 
 .gbg-pulse-dot {
-  filter: drop-shadow(0 0 4px var(--brand-light));
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
 }
 
 .gbg-node-dot {
-  fill: var(--brand-light);
-  opacity: 0.75;
+  fill: rgba(255, 255, 255, 0.15);
+  opacity: 1;
 }
 
 .gbg-node-glow {
-  opacity: 0.35;
+  opacity: 0.2;
 }
 
 .gbg-node {

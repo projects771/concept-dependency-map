@@ -59,8 +59,8 @@ export default function GraphBackground({ className = '' }) {
       <svg className="gbg-svg" viewBox="0 0 1000 650" preserveAspectRatio="xMidYMid slice">
         <defs>
           <radialGradient id="gbg-node-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--brand-accent)" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="var(--brand-accent)" stopOpacity="0" />
+            <stop offset="0%" stopColor="rgba(255,255,255,0.15)" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0.15)" stopOpacity="0" />
           </radialGradient>
         </defs>
 
@@ -72,7 +72,7 @@ export default function GraphBackground({ className = '' }) {
 
         <g className="gbg-pulses">
           {paths.filter((p) => p.pulse).map((p) => (
-            <circle key={`pulse-${p.id}`} r="2.4" className="gbg-pulse-dot" fill="var(--brand-light)">
+            <circle key={`pulse-${p.id}`} r="2.4" className="gbg-pulse-dot" fill="rgba(255,255,255,0.5)">
               <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
                 <mpath href={`#${p.id}`} />
               </animateMotion>

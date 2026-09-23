@@ -1,52 +1,57 @@
 .auth-container {
   position: relative;
   z-index: 1;
-  max-width: 420px;
+  max-width: 380px;
   width: 100%;
-  padding: 8px;
+  padding: 40px;
+  background: #111111;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xl);
 }
 
 .auth-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   text-align: center;
 }
 
 .auth-title {
-  color: var(--c-text);
-  font-weight: 700;
-  font-size: 1.3rem;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 600;
   margin: 14px 0 6px 0;
+  letter-spacing: -0.5px;
 }
 
 .auth-subtitle {
-  color: var(--brand-light);
+  color: #666666;
+  font-size: 14px;
   margin: 0;
-  font-size: 0.9rem;
 }
 
 .auth-google-btn {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 14px;
   width: 100%;
-  padding: 12px 16px;
-  background: var(--c-surface-2);
-  color: var(--c-text);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
   font-weight: 500;
   margin-bottom: 20px;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .auth-google-btn:hover {
-  border-color: var(--c-border-2);
-  background: var(--c-surface-3);
+  background: #222222;
+  border-color: rgba(255,255,255,0.2);
 }
 
 .auth-google-icon {
@@ -56,8 +61,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #fff;
-  color: #000;
+  background: #ffffff;
+  color: #000000;
   font-weight: 700;
   margin-right: 12px;
   font-size: 14px;
@@ -73,23 +78,23 @@
 .auth-divider hr {
   flex: 1;
   border: none;
-  border-top: 1px solid var(--c-border);
+  border-top: 1px solid rgba(255,255,255,0.08);
   margin: 0;
 }
 
 .auth-divider span {
-  color: var(--c-text-3);
+  color: #444444;
   font-size: 13px;
 }
 
 .auth-error {
-  color: var(--c-struggling);
-  background: rgba(248,113,113,0.1);
-  border: 1px solid rgba(248,113,113,0.25);
-  border-radius: var(--r-md);
+  color: #ef4444;
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 8px;
   padding: 10px 14px;
   margin-bottom: 16px;
-  font-size: 13.5px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -98,46 +103,67 @@
 
 .auth-label {
   display: block;
-  color: var(--c-text-2);
+  color: #aaaaaa;
   font-size: 13.5px;
   font-weight: 500;
   margin-bottom: 7px;
 }
 
 .auth-input {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 10px 14px;
+  font-size: 14px;
   width: 100%;
-  padding: 11px 14px;
-  background: var(--c-surface-2);
-  border: 1px solid var(--c-border);
-  color: var(--c-text);
-  border-radius: var(--r-md);
   box-sizing: border-box;
   outline: none;
-  font-size: 14px;
   font-family: inherit;
-  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-input::placeholder {
+  color: #444444;
 }
 
 .auth-input:focus {
-  border-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px var(--c-accent-glow);
+  border-color: rgba(255,255,255,0.3);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.05);
 }
 
 .auth-submit {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 500;
   width: 100%;
+  cursor: pointer;
   margin-bottom: 20px;
+  transition: background 0.15s ease;
+}
+
+.auth-submit:hover {
+  background: #e0e0e0;
 }
 
 .auth-footer {
   text-align: center;
-  font-size: 13.5px;
-  color: var(--c-text-3);
+  font-size: 13px;
+  color: #aaaaaa;
 }
 
 .auth-footer a {
-  color: var(--brand-light);
-  text-decoration: none;
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   font-weight: 500;
 }
 
-.auth-footer a:hover { text-decoration: underline; }
+.auth-footer a:hover {
+  color: #e0e0e0;
+}
