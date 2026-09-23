@@ -79,14 +79,15 @@ const FRAGMENT_SHADER_SRC = `
     // Slat face bevel highlight (edge catching ambient light)
     float bevelLight = smoothstep(0.05, 0.18, u) * smoothstep(0.4, 0.15, u) * 0.15;
 
-    // Specular and diffuse color combination (white/silver satin)
-    vec3 baseDark = vec3(0.055, 0.055, 0.06);
-    vec3 silverHighlight = vec3(0.95, 0.96, 1.0);
-    vec3 satinSheen = vec3(0.42, 0.45, 0.50);
+    // Specular and diffuse color combination (refined dark silver/platinum, not blinding)
+    vec3 baseDark = vec3(0.045, 0.045, 0.05);
+    vec3 silverHighlight = vec3(0.58, 0.60, 0.66);
+    vec3 satinSheen = vec3(0.24, 0.26, 0.30);
 
-    // Compose final slat illumination
+    // Compose final slat illumination with gentle, controlled specular brightness
     vec3 col = baseDark * (ambientRib + bevelLight) * groove;
-    col += (satinSheen * spotLight * 0.45 + silverHighlight * spec * 1.9 * spotLight) * groove;
+    col += (satinSheen * spotLight * 0.32 + silverHighlight * spec * 0.70 * spotLight) * groove;
+    col = clamp(col, 0.0, 0.55);
 
     // Subtle edge vignette
     vec2 vUv = uv * (1.0 - uv.yx);
@@ -270,8 +271,8 @@ export default function GraphBackground({ className = '' }) {
             currentMouse.x, myInverted, 0,
             currentMouse.x, myInverted, rad
           );
-          spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
-          spotGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)');
+          spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+          spotGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.025)');
           spotGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
           ctx.fillStyle = spotGrad;
           ctx.fillRect(0, 0, canvas.width, canvas.height);

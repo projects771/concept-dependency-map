@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo.jsx';
 import GraphBackground from './GraphBackground.jsx';
-import ConceptOrbit from './ConceptOrbit.jsx';
 import MiniDependencyChain from './MiniDependencyChain.jsx';
 import './LandingPage.css';
 
@@ -106,10 +105,6 @@ export default function LandingPage() {
               <span>◎</span> I'm a student
             </Link>
           </div>
-        </div>
-
-        <div className="lp-hero-visual">
-          <ConceptOrbit />
         </div>
       </main>
 
