@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as api from '../api/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import Logo from './Logo.jsx';
 import GraphBackground from './GraphBackground.jsx';
 import CourseCarousel from './CourseCarousel.jsx';
 import './CourseJoin.css';
@@ -57,8 +58,12 @@ export default function CourseJoin() {
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [coursesError, setCoursesError] = useState(false);
   const navigate = useNavigate();
-  const toast = useToast();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleSignOut = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     // Cached courses render immediately (see useState above) so the list
@@ -161,6 +166,30 @@ export default function CourseJoin() {
   return (
     <div className="ls-shell cj-shell">
       <GraphBackground />
+
+      {/* Top Navbar with Student Info & Sign Out */}
+      <header className="cj-nav">
+        <div className="cj-nav-inner">
+          <Logo />
+          <div className="cj-nav-user">
+            <span className="cj-user-tag">
+              {user?.name || user?.email ? (
+                <>Signed in as <strong className="cj-user-name">{user.name || user.email}</strong></>
+              ) : null}
+              <span className="ls-role-pill ls-role-pill--student">◎ Student</span>
+            </span>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm cj-signout-btn"
+              onClick={handleSignOut}
+              title="Sign out of your account"
+            >
+              ← Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
       <div className="cj-container">
         <div className="ls-card cj-join-card animate-slide-up">
           <div className="cj-icon">🔗</div>

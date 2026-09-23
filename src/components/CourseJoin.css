@@ -1,7 +1,74 @@
 .cj-shell {
   overflow-y: auto;
-  padding: 40px 20px;
+  padding: 84px 20px 60px;
   display: block;
+}
+
+/* ── Top Navbar with Sign Out ─────────────────────────────── */
+.cj-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  z-index: 100;
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+}
+
+.cj-nav-inner {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.cj-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cj-user-tag {
+  color: #aaaaaa;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cj-user-name {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.cj-signout-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cj-signout-btn:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+@media (max-width: 600px) {
+  .cj-user-tag {
+    display: none;
+  }
 }
 
 .cj-container {
