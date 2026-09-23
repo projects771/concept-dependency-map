@@ -46,6 +46,7 @@
   cursor: pointer;
   font-weight: 500;
   margin-bottom: 20px;
+  text-decoration: none !important;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
@@ -134,9 +135,9 @@
 }
 
 .auth-submit {
-  background: #ffffff;
-  color: #000000;
-  border: none;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
   border-radius: 8px;
   padding: 11px;
   font-size: 14px;
@@ -144,11 +145,14 @@
   width: 100%;
   cursor: pointer;
   margin-bottom: 20px;
+  text-decoration: none !important;
   transition: background 0.15s ease;
 }
 
 .auth-submit:hover {
-  background: #e0e0e0;
+  background: #e0e0e0 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
 }
 
 .auth-footer {
@@ -159,11 +163,14 @@
 
 .auth-footer a {
   color: #ffffff;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
   font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 1px;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .auth-footer a:hover {
-  color: #e0e0e0;
+  color: #ffffff;
+  border-bottom-color: #ffffff;
 }

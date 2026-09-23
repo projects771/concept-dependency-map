@@ -104,33 +104,38 @@
 }
 
 .tb-btn-add {
-  background: #ffffff;
-  color: #000000;
-  border: none;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
   border-radius: 8px;
   padding: 5px 12px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
+  text-decoration: none !important;
   transition: background 0.15s ease;
 }
 .tb-btn-add:hover {
-  background: #e0e0e0;
+  background: #e0e0e0 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
 }
 
 .tb-btn-layout {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #aaaaaa;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #aaaaaa !important;
   border-radius: 8px;
   padding: 5px 12px;
   font-size: 12px;
   cursor: pointer;
+  text-decoration: none !important;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .tb-btn-layout:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .tb-code-pill {

@@ -1,97 +1,305 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './GraphBackground.css';
 
 /**
- * Subtle animated knowledge-graph backdrop.
- * Renders a static field of drifting nodes + connecting lines,
- * with a couple of light "pulses" travelling along a few edges to
- * suggest live dependency traffic. Pure CSS/SVG — no animation loop,
- * so it's cheap to mount behind any full-screen view.
- *
- * Usage: <GraphBackground /> as the first child of a `position: relative`
- * (or fixed) full-bleed container. It positions itself absolutely and
- * never intercepts pointer events.
+ * Dark Vertical Blinds - Interactive WebGL Canvas Backdrop
+ * Replicates the realistic satin fluted-glass / vertical blinds reflection
+ * with smooth cursor-following illumination and liquid wave refraction.
  */
 
-const NODES = [
-  { id: 'n1', x: 90,  y: 120, r: 5, delay: '0s' },
-  { id: 'n2', x: 260, y: 60,  r: 3.5, delay: '-2s' },
-  { id: 'n3', x: 210, y: 260, r: 4, delay: '-5s' },
-  { id: 'n4', x: 420, y: 150, r: 6, delay: '-1s' },
-  { id: 'n5', x: 520, y: 320, r: 3.5, delay: '-4s' },
-  { id: 'n6', x: 650, y: 90,  r: 4.5, delay: '-3s' },
-  { id: 'n7', x: 780, y: 240, r: 5, delay: '-6s' },
-  { id: 'n8', x: 900, y: 110, r: 3.5, delay: '-2.5s' },
-  { id: 'n9', x: 60,  y: 400, r: 4, delay: '-3.5s' },
-  { id: 'n10', x: 330, y: 440, r: 5, delay: '-1.5s' },
-  { id: 'n11', x: 600, y: 480, r: 3.5, delay: '-4.5s' },
-  { id: 'n12', x: 860, y: 420, r: 4.5, delay: '-0.5s' },
-  { id: 'n13', x: 980, y: 340, r: 3.5, delay: '-5.5s' },
-  { id: 'n14', x: 150, y: 560, r: 4, delay: '-2.2s' },
-  { id: 'n15', x: 470, y: 600, r: 3.5, delay: '-3.8s' },
-  { id: 'n16', x: 730, y: 590, r: 5, delay: '-1.2s' },
-];
+const VERTEX_SHADER_SRC = `
+  attribute vec2 position;
+  void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+  }
+`;
 
-const EDGES = [
-  ['n1', 'n2'], ['n1', 'n3'], ['n2', 'n4'], ['n3', 'n4'], ['n4', 'n6'],
-  ['n6', 'n7'], ['n6', 'n8'], ['n7', 'n12'], ['n5', 'n4'], ['n5', 'n10'],
-  ['n9', 'n1'], ['n9', 'n14'], ['n10', 'n14'], ['n10', 'n15'], ['n11', 'n15'],
-  ['n11', 'n16'], ['n12', 'n16'], ['n12', 'n13'], ['n3', 'n9'], ['n7', 'n13'],
-];
+const FRAGMENT_SHADER_SRC = `
+  precision highp float;
+  uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
+  uniform float u_time;
+  uniform float u_speed;
 
-// A handful of edges get a travelling "pulse" to suggest live data flow.
-const PULSE_EDGES = [0, 4, 9, 13, 17];
+  void main() {
+    vec2 fragCoord = gl_FragCoord.xy;
+    vec2 uv = fragCoord / u_resolution;
 
-const byId = Object.fromEntries(NODES.map((n) => [n.id, n]));
+    // Slat dimensions (responsive, approx 22-28px wide)
+    float slatWidth = clamp(floor(u_resolution.x / 52.0), 18.0, 28.0);
+    
+    // Distance from mouse light
+    vec2 m = u_mouse;
+    vec2 delta = fragCoord - m;
+    float dist = length(delta);
+
+    // Smooth outward liquid lens wave refraction following the cursor
+    float waveRadius = 340.0;
+    float distNorm = dist / waveRadius;
+    float dome = exp(-distNorm * distNorm * 2.2);
+    float ripple = sin(distNorm * 9.0 - u_time * 2.4) * exp(-distNorm * 2.0);
+    float displacement = (dome * 14.0 + ripple * 6.0) * (1.0 + u_speed * 1.5);
+    float wave = (delta.x / (dist + 35.0)) * displacement;
+    float displacedX = fragCoord.x + wave;
+
+    // Slat coordinates
+    float slatCoord = displacedX / slatWidth;
+    float u = fract(slatCoord); // [0, 1] across slat
+    float slatIndex = floor(slatCoord);
+
+    // Fluted cylindrical curved normal across each vertical slat
+    float centerOffset = (u - 0.5) * 2.0; // [-1, 1]
+    float nx = centerOffset * 0.75;
+    float nz = sqrt(clamp(1.0 - nx * nx, 0.05, 1.0));
+    vec3 normal = normalize(vec3(nx, 0.0, nz));
+
+    // Dynamic light at cursor
+    vec3 lightPos = vec3(m.x, m.y, 180.0);
+    vec3 fragPos3 = vec3(fragCoord.x, fragCoord.y, 0.0);
+    vec3 lightDir = normalize(lightPos - fragPos3);
+    vec3 viewDir = vec3(0.0, 0.0, 1.0);
+
+    // Anisotropic vertical highlight along blinds
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfDir), 0.0), 24.0);
+
+    // Elliptical vertical sheen falloff (light stretches vertically along slats)
+    float radX = 360.0;
+    float radY = 520.0;
+    float ellipseDistSq = (delta.x * delta.x) / (radX * radX) + (delta.y * delta.y) / (radY * radY);
+    float spotLight = 1.0 / (1.0 + ellipseDistSq * 2.2);
+
+    // Ambient slats structure across whole background
+    float ambientRib = 0.04 + 0.035 * (nz * 0.8 + 0.2 * sin(slatIndex * 0.3));
+    
+    // Deep groove between adjacent slats (beveled shadow)
+    float groove = smoothstep(0.0, 0.07, u) * smoothstep(1.0, 0.93, u);
+    groove = mix(0.12, 1.0, groove);
+
+    // Slat face bevel highlight (edge catching ambient light)
+    float bevelLight = smoothstep(0.05, 0.18, u) * smoothstep(0.4, 0.15, u) * 0.15;
+
+    // Specular and diffuse color combination (white/silver satin)
+    vec3 baseDark = vec3(0.055, 0.055, 0.06);
+    vec3 silverHighlight = vec3(0.95, 0.96, 1.0);
+    vec3 satinSheen = vec3(0.42, 0.45, 0.50);
+
+    // Compose final slat illumination
+    vec3 col = baseDark * (ambientRib + bevelLight) * groove;
+    col += (satinSheen * spotLight * 0.45 + silverHighlight * spec * 1.9 * spotLight) * groove;
+
+    // Subtle edge vignette
+    vec2 vUv = uv * (1.0 - uv.yx);
+    float vig = vUv.x * vUv.y * 15.0;
+    vig = clamp(pow(vig, 0.2), 0.0, 1.0);
+    col *= vig;
+
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
+function createShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+  return shader;
+}
 
 export default function GraphBackground({ className = '' }) {
-  const paths = useMemo(
-    () => EDGES.map(([a, b], i) => {
-      const p1 = byId[a];
-      const p2 = byId[b];
-      return { id: `e${i}`, d: `M${p1.x},${p1.y} L${p2.x},${p2.y}`, pulse: PULSE_EDGES.includes(i) };
-    }),
-    []
-  );
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let gl = canvas.getContext('webgl', {
+      alpha: false,
+      depth: false,
+      stencil: false,
+      antialias: false,
+      powerPreference: 'high-performance',
+    }) || canvas.getContext('experimental-webgl');
+
+    let isFallback = !gl;
+    let animId = null;
+    let program = null;
+    let buffer = null;
+
+    // Uniform locations
+    let uResLoc, uMouseLoc, uTimeLoc, uSpeedLoc;
+
+    // Position state
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    let currentMouse = { x: width * 0.5 * dpr, y: height * 0.5 * dpr };
+    let userTargetMouse = { x: width * 0.5 * dpr, y: height * 0.5 * dpr };
+    let lastInteraction = performance.now();
+    let smoothedSpeed = 0;
+    const startTime = performance.now();
+
+    function updateSize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+
+      if (gl) {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    if (!isFallback) {
+      const vertShader = createShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SRC);
+      const fragShader = createShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+
+      if (!vertShader || !fragShader) {
+        isFallback = true;
+      } else {
+        program = gl.createProgram();
+        gl.attachShader(program, vertShader);
+        gl.attachShader(program, fragShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.error('Program link error:', gl.getProgramInfoLog(program));
+          isFallback = true;
+        } else {
+          gl.useProgram(program);
+
+          const posLoc = gl.getAttribLocation(program, 'position');
+          buffer = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([
+              -1, -1,
+               1, -1,
+              -1,  1,
+              -1,  1,
+               1, -1,
+               1,  1
+            ]),
+            gl.STATIC_DRAW
+          );
+          gl.enableVertexAttribArray(posLoc);
+          gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+          uResLoc = gl.getUniformLocation(program, 'u_resolution');
+          uMouseLoc = gl.getUniformLocation(program, 'u_mouse');
+          uTimeLoc = gl.getUniformLocation(program, 'u_time');
+          uSpeedLoc = gl.getUniformLocation(program, 'u_speed');
+        }
+      }
+    }
+
+    updateSize();
+
+    // Event listeners
+    const onPointerMove = (e) => {
+      userTargetMouse.x = e.clientX * dpr;
+      userTargetMouse.y = (height - e.clientY) * dpr; // WebGL Y is inverted
+      lastInteraction = performance.now();
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('resize', updateSize);
+
+    // Render loop
+    function loop() {
+      const now = performance.now();
+      const elapsed = (now - startTime) * 0.001;
+
+      // Ambient idle oscillation when no mouse activity
+      const idleSec = (now - lastInteraction) * 0.001;
+      const idleBlend = Math.min(Math.max((idleSec - 1.5) * 0.8, 0), 1);
+
+      const ambientX = (width * (0.5 + 0.28 * Math.sin(elapsed * 0.45))) * dpr;
+      const ambientY = (height * (0.5 + 0.22 * Math.cos(elapsed * 0.35))) * dpr;
+
+      const targetX = userTargetMouse.x * (1 - idleBlend) + ambientX * idleBlend;
+      const targetY = userTargetMouse.y * (1 - idleBlend) + ambientY * idleBlend;
+
+      const dx = targetX - currentMouse.x;
+      const dy = targetY - currentMouse.y;
+      currentMouse.x += dx * 0.08;
+      currentMouse.y += dy * 0.08;
+
+      const instSpeed = Math.sqrt(dx * dx + dy * dy);
+      smoothedSpeed += (instSpeed - smoothedSpeed) * 0.1;
+      const normSpeed = Math.min(smoothedSpeed / (40.0 * dpr), 1.0);
+
+      if (!isFallback && gl) {
+        gl.useProgram(program);
+        gl.uniform2f(uResLoc, canvas.width, canvas.height);
+        gl.uniform2f(uMouseLoc, currentMouse.x, currentMouse.y);
+        gl.uniform1f(uTimeLoc, elapsed);
+        gl.uniform1f(uSpeedLoc, normSpeed);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      } else {
+        // 2D Canvas Fallback
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#0a0a0a';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const slatW = 24 * dpr;
+          const numSlats = Math.ceil(canvas.width / slatW);
+
+          for (let i = 0; i < numSlats; i++) {
+            const sx = i * slatW;
+            const grad = ctx.createLinearGradient(sx, 0, sx + slatW, 0);
+            grad.addColorStop(0, '#060606');
+            grad.addColorStop(0.5, '#141414');
+            grad.addColorStop(1, '#080808');
+            ctx.fillStyle = grad;
+            ctx.fillRect(sx, 0, slatW, canvas.height);
+          }
+
+          // Mouse spotlight
+          const myInverted = canvas.height - currentMouse.y;
+          const rad = 400 * dpr;
+          const spotGrad = ctx.createRadialGradient(
+            currentMouse.x, myInverted, 0,
+            currentMouse.x, myInverted, rad
+          );
+          spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
+          spotGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)');
+          spotGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = spotGrad;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      animId = requestAnimationFrame(loop);
+    }
+
+    animId = requestAnimationFrame(loop);
+
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('resize', updateSize);
+
+      if (gl && program) {
+        gl.deleteProgram(program);
+      }
+      if (gl && buffer) {
+        gl.deleteBuffer(buffer);
+      }
+    };
+  }, []);
 
   return (
     <div className={`gbg ${className}`} aria-hidden="true">
-      <svg className="gbg-svg" viewBox="0 0 1000 650" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <radialGradient id="gbg-node-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.15)" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="rgba(255,255,255,0.15)" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        <g className="gbg-edges">
-          {paths.map((p) => (
-            <path key={p.id} id={p.id} d={p.d} className="gbg-edge" />
-          ))}
-        </g>
-
-        <g className="gbg-pulses">
-          {paths.filter((p) => p.pulse).map((p) => (
-            <circle key={`pulse-${p.id}`} r="2.4" className="gbg-pulse-dot" fill="rgba(255,255,255,0.5)">
-              <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
-                <mpath href={`#${p.id}`} />
-              </animateMotion>
-              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="6s" repeatCount="indefinite" />
-            </circle>
-          ))}
-        </g>
-
-        <g className="gbg-nodes">
-          {NODES.map((n) => (
-            <g key={n.id} transform={`translate(${n.x},${n.y})`}>
-              <g className="gbg-node" style={{ animationDelay: n.delay }}>
-                <circle r={n.r * 3.2} fill="url(#gbg-node-glow)" className="gbg-node-glow" />
-                <circle r={n.r} className="gbg-node-dot" />
-              </g>
-            </g>
-          ))}
-        </g>
-      </svg>
+      <canvas ref={canvasRef} className="gbg-canvas" />
     </div>
   );
 }

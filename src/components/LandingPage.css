@@ -4,7 +4,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #0d0d0d;
+  background-color: transparent;
   color: #ffffff;
   overflow-x: hidden;
 }
@@ -17,7 +17,8 @@
   width: 100%;
   height: 52px;
   z-index: 100;
-  background: #0d0d0d;
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
@@ -39,33 +40,44 @@
   gap: 12px;
 }
 
+.lp-nav-actions a,
+.lp-nav-actions .btn {
+  text-decoration: none !important;
+}
+
 .lp-nav-actions .btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.14);
-  color: #ffffff;
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  color: #ffffff !important;
   border-radius: 8px;
   padding: 6px 16px;
   font-size: 13px;
+  text-decoration: none !important;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .lp-nav-actions .btn-ghost:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.06) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .lp-nav-actions .btn-primary {
-  background: #ffffff;
-  color: #000000;
-  border: none;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
   border-radius: 8px;
   padding: 6px 16px;
   font-size: 13px;
   font-weight: 500;
+  text-decoration: none !important;
   transition: background 0.15s ease;
 }
 
 .lp-nav-actions .btn-primary:hover {
-  background: #e0e0e0;
+  background: #e0e0e0 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
 }
 
 /* ── Hero ──────────────────────────────────────────────────── */
@@ -81,7 +93,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 130px 32px 60px;
-  background: #0d0d0d;
+  background: transparent;
 }
 
 .lp-hero-copy {
@@ -126,9 +138,9 @@
 }
 
 .lp-cta-educator {
-  background: #ffffff;
-  color: #000000;
-  border: none;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
   border-radius: 8px;
   padding: 10px 24px;
   font-size: 14px;
@@ -136,18 +148,20 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
+  text-decoration: none !important;
   transition: background 0.15s ease;
 }
 
 .lp-cta-educator:hover {
-  background: #e0e0e0;
+  background: #e0e0e0 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
 }
 
 .lp-cta-student {
-  background: transparent;
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
   border-radius: 8px;
   padding: 10px 24px;
   font-size: 14px;
@@ -155,13 +169,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
+  text-decoration: none !important;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .lp-cta-student:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.3) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .lp-hero-visual {
@@ -491,7 +507,8 @@
   background: #111111;
   border: 1px solid rgba(255,255,255,0.06);
   backdrop-filter: blur(8px);
-  text-decoration: none;
+  text-decoration: none !important;
+  color: inherit;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 

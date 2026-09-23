@@ -277,8 +277,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
   min-width: 0;
   flex: 1;
   color: #aaaaaa;
@@ -288,6 +287,8 @@
 
 .sp-resource-link:hover {
   color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .sp-resource-link-name {
