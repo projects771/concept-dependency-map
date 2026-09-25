@@ -42,6 +42,8 @@ export default function EducatorDashboard() {
     }
   };
 
+  const [copiedCode, setCopiedCode] = useState(null);
+
   const handleSignOut = () => {
     logout();
     navigate('/');
@@ -49,7 +51,11 @@ export default function EducatorDashboard() {
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
-    toast.success('Course code copied!');
+    setCopiedCode(code);
+    toast.success(`Course code ${code} copied!`);
+    setTimeout(() => {
+      setCopiedCode((curr) => (curr === code ? null : curr));
+    }, 2000);
   };
 
   return (
@@ -76,37 +82,35 @@ export default function EducatorDashboard() {
             <div className="ls-skeleton-item"><div className="skeleton" style={{ width: '55%', height: 15 }} /></div>
           </div>
         ) : courses.length > 0 ? (
-          <>
-            <CourseCarousel
-              courses={courses}
-              actionLabel="Edit Graph →"
-              onOpen={(course) => navigate(`/course/${course.id}/edit`)}
-              renderMeta={(course) => (
-                <>
-                  <span>{course.courseCode}</span>
-                  <span>
-                    {course.studentCount || 0} student{(course.studentCount !== 1) ? 's' : ''} enrolled
-                  </span>
-                </>
-              )}
-            />
-            {/* Share-code copying stays outside the carousel: putting a
-                second button inside a card would make the whole card's
-                click target ambiguous. */}
-            <div className="edu-share-row">
-              {courses.map(course => (
-                <div key={course.id} className="edu-share-item">
-                  <span className="t-faint">{course.title} share code: </span>
-                  <code className="t-mono edu-share-code">{course.courseCode}</code>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ padding: '2px 6px', marginLeft: 6, height: 'auto', fontSize: 12 }}
-                    onClick={() => copyCode(course.courseCode)}
-                  >Copy</button>
-                </div>
-              ))}
-            </div>
-          </>
+          <CourseCarousel
+            courses={courses}
+            actionLabel="Edit Graph →"
+            onOpen={(course) => navigate(`/course/${course.id}/edit`)}
+            renderMeta={(course) => (
+              <div className="edu-card-meta">
+                {course.courseCode && (
+                  <div className="edu-card-code-pill" onClick={(e) => e.stopPropagation()}>
+                    <span className="edu-card-code-label">Code</span>
+                    <code className="edu-card-code-val t-mono">{course.courseCode}</code>
+                    <button
+                      type="button"
+                      className="edu-card-copy-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyCode(course.courseCode);
+                      }}
+                      title="Copy course code"
+                    >
+                      {copiedCode === course.courseCode ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+                )}
+                <span className="edu-card-enrolled">
+                  {course.studentCount || 0} student{(course.studentCount !== 1) ? 's' : ''} enrolled
+                </span>
+              </div>
+            )}
+          />
         ) : (
           <div className="ls-empty">
             <div className="ls-empty-icon">◈</div>

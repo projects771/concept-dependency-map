@@ -84,21 +84,27 @@ export default function CourseCarousel({ courses, onOpen, actionLabel = 'Open co
                 aria-hidden={hidden ? 'true' : undefined}
                 {...(hidden ? { inert: '' } : {})}
               >
-                <button
-                  type="button"
+                <div
+                  role="button"
                   className="cc-card-inner"
                   tabIndex={isActive ? 0 : -1}
                   aria-current={isActive ? 'true' : undefined}
                   onClick={() => (isActive ? onOpen?.(course) : setIndex(i))}
+                  onKeyDown={(e) => {
+                    if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      isActive ? onOpen?.(course) : setIndex(i);
+                    }
+                  }}
                 >
                   <span className="cc-card-glyph" aria-hidden="true">◈</span>
                   <span className="cc-card-title">{course.title || course.name || 'Untitled course'}</span>
                   {course.description && (
                     <span className="cc-card-desc">{course.description}</span>
                   )}
-                  {renderMeta && <span className="cc-card-meta">{renderMeta(course)}</span>}
+                  {renderMeta && <div className="cc-card-meta">{renderMeta(course)}</div>}
                   <span className="cc-card-action">{isActive ? actionLabel : 'Select'}</span>
-                </button>
+                </div>
               </div>
             );
           })}
