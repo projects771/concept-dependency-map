@@ -33,10 +33,13 @@ export default function App() {
     document.title = 'Nodemap';
   }, []);
 
+  const rawBase = import.meta.env.BASE_URL || '/';
+  const basename = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
+
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
-        <BrowserRouter basename="/concept-dependency-map">
+        <BrowserRouter basename={basename || undefined}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/join" element={<RoleSelection />} />
